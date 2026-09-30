@@ -8,11 +8,10 @@ library chosen yet, no auth wired up. Backend is `ccc-employment-system-backend`
 
 ## Current state
 
-Default `create-next-app` layout — `src/app/layout.tsx`, `src/app/page.tsx`.
-Nothing route- or feature-specific exists yet. The conventions below are the
-intended direction (mirrored from the more mature `digipay-web-client-typescript`
-sibling project), to adopt as real routes/features get added rather than
-decided ad hoc per PR.
+Screens: `/login`, `/dashboard` (Today + time clock), `/employees` (list,
+new, detail, edit/delete), `/attendance` (by date, manual entry, edit/delete).
+Tailwind v4 with the trest palette (`ink`, `muted`, `canvas`, `line`, `moss`,
+`clay`, `brick`) in `src/app/globals.css`.
 
 ## Server vs Client Components
 
@@ -36,10 +35,18 @@ than one route needs them, then move up to the nearest shared `_*` folder.
 aliases (`@components/*`, `@lib/*`, etc.) once there's enough shared code to
 justify them — don't pre-create empty alias folders.
 
-## Data fetching
+## Data fetching (BFF)
 
-Not yet decided. When wiring up the Laravel API, prefer the Server
-Action pattern the reference project uses (`<feature>/<name>.action.ts` "use
-server" boundary calling a `.server.ts` fetch helper) over ad-hoc `fetch()`
-calls scattered through client components — keeps auth/session handling in
-one place.
+The browser never calls Laravel. Server Components read with
+`apiData<T>(path)` and Server Actions write with `apiFetch<T>(path, {method, body})`
+(`src/app/_lib/api.server.ts`); both attach `Authorization: Bearer` from the
+`httpOnly` cookie `ccc_token`. `API_URL` is server-only.
+
+- Actions live in `<route>/_actions/*.action.ts`, return `ActionState`
+  (`{message?, error?, errors?}`) for `useActionState`, and build explicit JSON
+  bodies — the API rejects unknown fields.
+- `src/proxy.ts` only checks the cookie exists (optimistic). A 401 from the API
+  redirects to `/auth/expired`, a Route Handler that clears the cookie (Server
+  Components cannot) and sends the user to `/login?expired=1`.
+- Formatting of API raw values (`HH:MM:SS`, minutes, `Y-m-d`) is in
+  `src/app/_lib/format.ts`.

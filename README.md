@@ -13,8 +13,8 @@ conventions.
 ## Prerequisites
 
 - Node.js 20+ and npm
-- The backend running locally (see its README) — this app expects an API to
-  call once features land
+- The backend running locally (`php artisan migrate:fresh --seed && php artisan serve`).
+  Sign in with `admin@example.com` / `password`. `npm run e2e` needs it running and freshly seeded.
 
 ## Setup
 
@@ -22,6 +22,7 @@ conventions.
 git clone https://github.com/jejerome28/ccc-employment-system-client.git
 cd ccc-employment-system-client
 npm install
+cp .env.example .env.local   # API_URL=http://127.0.0.1:8000
 npm run dev
 ```
 
