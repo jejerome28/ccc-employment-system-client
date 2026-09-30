@@ -18,11 +18,12 @@ issue for a security finding, since this handles employee/HR data.
 
 ## Things to get right when building this out
 
-- **Session/auth**: prefer a server-issued, `httpOnly`, `secure` cookie over
-  any client-readable token storage (`localStorage`, non-`httpOnly` cookie,
-  Redux/Context state that outlives the request).
-- **Access control**: gate authenticated routes server-side (layout or
-  middleware reading the session cookie), not just by hiding UI client-side.
+- **Session/auth (shipped)**: Sanctum token stored only in the `httpOnly`,
+  `sameSite=lax`, `secure`-in-production cookie `ccc_token`, set by a Server
+  Action; expires with the token (8h). Never exposed to client JS.
+- **Access control (shipped)**: `src/proxy.ts` redirects requests without the
+  cookie to `/login`; the Laravel API enforces `auth:sanctum` on every call and
+  a 401 clears the cookie via `/auth/expired`.
 - **PII**: employee records are personal data — never log full request/response
   bodies containing them; log identifiers only.
 - **CSP / security headers**: set centrally (`next.config.js` `headers()`)

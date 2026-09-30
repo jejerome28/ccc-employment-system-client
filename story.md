@@ -14,19 +14,14 @@ This repository is the **web client** for CCC's employment system — the
 dashboard HR staff and managers use to manage the employee lifecycle:
 records, attendance, leave, and payroll-adjacent data.
 
-## What the solution does (expected, fill in as features land)
+## What the solution does
 
-- **Employees** — records for every employee: personal info, employment
-  status, role/department.
-- **Attendance** — time in/out tracking, shift assignment.
-- **Leave** — requests, approvals, balances.
-- **Payroll inputs** — the data payroll processing depends on (hours,
-  leave taken, adjustments), even if payroll computation itself lives
-  elsewhere.
-
-This section is a placeholder — replace each bullet with what's actually
-built as features ship, the way the reference Digipay dashboard's story.md
-describes its real, shipped Store/Wallet/Transactions features.
+- **Employees (shipped)** — list with search/status filter, add, edit, delete
+  (removes their attendance), detail page with monthly time records and totals.
+- **Attendance (shipped)** — dashboard time clock (time in / time out per
+  employee, live stats), daily time records with totals, manual entry and
+  correction, overnight shifts.
+- **Leave, payroll inputs** — not built yet.
 
 ## Backend
 
