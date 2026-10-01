@@ -9,7 +9,7 @@ import { ClockButton } from "./_components/ClockButton";
 export const metadata: Metadata = { title: "Today" };
 
 export default async function DashboardPage() {
-  const { stats, hours_today, employees } = await apiData<DashboardData>("/api/dashboard");
+  const { stats, hours_today, employees } = await apiData<DashboardData>(`/api/dashboard?date=${todayManila()}`);
 
   const cards = [
     { label: "On the clock now", value: stats.clocked_in, tone: "text-clay" },
@@ -70,14 +70,14 @@ export default async function DashboardPage() {
                       <Link href={`/employees/${e.id}`} className="font-medium hover:underline underline-offset-2">{e.full_name}</Link>
                       <p className="text-xs text-muted">{e.employee_code} · {e.position || "No position set"}</p>
                     </td>
-                    <td className="px-4 py-3 tnum">{formatClock(log?.time_in)}</td>
-                    <td className="px-4 py-3 tnum">{formatClock(log?.time_out)}</td>
-                    <td className={`px-4 py-3 tnum ${log?.time_in && !log.time_out ? "text-clay" : ""}`}>{formatDuration(log)}</td>
+                    <td className="px-4 py-3 tnum">{formatClock(log?.clock_in_at)}</td>
+                    <td className="px-4 py-3 tnum">{formatClock(log?.clock_out_at)}</td>
+                    <td className={`px-4 py-3 tnum ${log?.clock_in_at && !log.clock_out_at ? "text-clay" : ""}`}>{formatDuration(log)}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end">
-                        {!log?.time_in ? (
+                        {!log?.clock_in_at ? (
                           <ClockButton employeeId={e.id} kind="time-in" />
-                        ) : !log.time_out ? (
+                        ) : !log.clock_out_at ? (
                           <ClockButton employeeId={e.id} kind="time-out" />
                         ) : (
                           <span className="text-xs text-muted">Done for today</span>

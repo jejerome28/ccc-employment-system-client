@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { apiData } from "@/app/_lib/api.server";
-import { formatClock, formatDate, formatDuration, formatMinutes } from "@/app/_lib/format";
+import { formatClock, formatDate, formatDuration, formatMinutes, thisMonthManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import type { EmployeeDetail } from "@/app/_lib/types";
 import { PageHeader } from "../../_components/PageHeader";
 
 export default async function EmployeePage(props: PageProps<"/employees/[id]">) {
   const { id } = await props.params;
-  const month = param((await props.searchParams).month);
+  const month = param((await props.searchParams).month) || thisMonthManila();
   const { employee: e, attendances, total_minutes, days_present } = await apiData<EmployeeDetail>(
-    `/api/employees/${id}${month ? `?month=${encodeURIComponent(month)}` : ""}`,
+    `/api/employees/${id}?month=${encodeURIComponent(month)}`,
   );
 
   const details: [string, string][] = [
@@ -70,8 +70,8 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
                   attendances.map((a) => (
                     <tr key={a.id}>
                       <td className="px-4 py-3 tnum">{formatDate(a.work_date, "short")}</td>
-                      <td className="px-4 py-3 tnum">{formatClock(a.time_in)}</td>
-                      <td className="px-4 py-3 tnum">{formatClock(a.time_out)}</td>
+                      <td className="px-4 py-3 tnum">{formatClock(a.clock_in_at)}</td>
+                      <td className="px-4 py-3 tnum">{formatClock(a.clock_out_at)}</td>
                       <td className="px-4 py-3 tnum">{formatDuration(a)}</td>
                       <td className="px-4 py-3 text-muted text-xs">{a.notes || "—"}</td>
                       <td className="px-4 py-3 text-right">

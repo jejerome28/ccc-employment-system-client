@@ -78,6 +78,20 @@ describe("apiFetch", () => {
 
     await expect(apiFetch("/api/dashboard")).rejects.toThrow("API 500: Server error.");
   });
+
+  it("sends FormData as-is without a JSON content type", async () => {
+    (getToken as jest.Mock).mockResolvedValue("tok");
+    reply(200, { success: true, message: "Imported 1 rows.", data: { created: 1, updated: 0, unknown: [] } });
+    const body = new FormData();
+    body.set("file", new Blob(["747,263"], { type: "text/csv" }), "report.csv");
+
+    await apiFetch("/api/attendance/import", { method: "POST", body });
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.body).toBe(body);
+    expect(init.headers["Content-Type"]).toBeUndefined();
+    expect(init.headers.Authorization).toBe("Bearer tok");
+  });
 });
 
 describe("apiData", () => {
