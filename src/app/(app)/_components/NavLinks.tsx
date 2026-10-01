@@ -7,6 +7,7 @@ const NAV = [
   { href: "/dashboard", label: "Today" },
   { href: "/employees", label: "Employees" },
   { href: "/attendance", label: "Time records" },
+  { href: "/attendance/import", label: "Import" },
 ];
 
 export function NavLinks() {
@@ -15,7 +16,8 @@ export function NavLinks() {
   return (
     <nav className="px-3 pb-4 flex lg:block gap-1 overflow-x-auto">
       {NAV.map(({ href, label }) => {
-        const active = pathname === href || pathname.startsWith(`${href}/`);
+        const deeper = NAV.some((n) => n.href.length > href.length && pathname.startsWith(n.href));
+        const active = pathname === href || (pathname.startsWith(`${href}/`) && !deeper);
         return (
           <Link
             key={href}

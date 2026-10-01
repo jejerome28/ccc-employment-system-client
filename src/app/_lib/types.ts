@@ -2,16 +2,26 @@ export type Attendance = {
   id: number;
   employee_id: number;
   work_date: string; // Y-m-d
-  time_in: string | null; // HH:MM:SS
-  time_out: string | null;
+  clock_in_at: string | null;
+  clock_out_at: string | null;
   notes: string | null;
   worked_minutes: number | null;
+  timetable: string | null;
+  status: string | null;
+  work_minutes: number | null;
+  ot_minutes: number | null;
+  attended_minutes: number | null;
+  late_minutes: number | null;
+  early_minutes: number | null;
+  absent_minutes: number | null;
+  leave_minutes: number | null;
   employee?: Employee;
 };
 
 export type Employee = {
   id: number;
   employee_code: string;
+  biometric_id: string | null;
   first_name: string;
   last_name: string;
   full_name: string;

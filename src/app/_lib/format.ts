@@ -6,10 +6,26 @@ const MONTHS = [
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export function formatClock(time: string | null | undefined): string {
-  if (!time) return "—";
-  const [h, m] = time.split(":").map(Number);
-  return `${h % 12 || 12}:${pad(m)} ${h < 12 ? "AM" : "PM"}`;
+const OFFSET = "+08:00";
+const OFFSET_MS = 8 * 60 * 60 * 1000;
+
+const manila = (iso: string) => new Date(Date.parse(iso) + OFFSET_MS);
+
+export function formatClock(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = manila(iso);
+  const h = d.getUTCHours();
+  return `${h % 12 || 12}:${pad(d.getUTCMinutes())} ${h < 12 ? "AM" : "PM"}`;
+}
+
+export function toClockInput(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = manila(iso);
+  return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+}
+
+export function manilaToUtcIso(ymd: string, hhmm: string): string {
+  return new Date(`${ymd}T${hhmm}:00${OFFSET}`).toISOString().replace(".000Z", "Z");
 }
 
 export function formatMinutes(minutes: number): string {
@@ -17,10 +33,10 @@ export function formatMinutes(minutes: number): string {
 }
 
 export function formatDuration(
-  a: { time_in: string | null; worked_minutes: number | null } | null | undefined,
+  a: { clock_in_at: string | null; worked_minutes: number | null } | null | undefined,
 ): string {
   if (!a) return "—";
-  if (a.worked_minutes === null) return a.time_in ? "Still in" : "—";
+  if (a.worked_minutes === null) return a.clock_in_at ? "Still in" : "—";
   return formatMinutes(a.worked_minutes);
 }
 
@@ -35,5 +51,9 @@ export function formatDate(ymd: string, style: "long" | "short" | "medium"): str
 }
 
 export function todayManila(): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Manila" }).format(new Date());
+  return manila(new Date().toISOString()).toISOString().slice(0, 10);
+}
+
+export function thisMonthManila(): string {
+  return todayManila().slice(0, 7);
 }

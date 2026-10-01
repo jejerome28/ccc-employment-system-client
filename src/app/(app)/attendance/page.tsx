@@ -13,6 +13,8 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
   const sp = await props.searchParams;
   const date = param(sp.date) || todayManila();
   const q = param(sp.q);
+  const exportError = param(sp.export_error);
+  const monthStart = `${todayManila().slice(0, 8)}01`;
 
   const { attendances, total_minutes, employees } = await apiData<AttendanceDay>(
     `/api/attendance?${new URLSearchParams({ date, ...(q && { q }) })}`,
@@ -21,6 +23,24 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
   return (
     <>
       <PageHeader title="Time records" subtitle={formatDate(date, "long")} />
+
+      {exportError && (
+        <div role="alert" className="mb-5 rounded border border-brick/30 bg-brick/10 px-4 py-3 text-sm text-brick">
+          {exportError}
+        </div>
+      )}
+
+      <form action="/attendance/export" method="get" className="mb-5 flex flex-wrap items-end gap-2">
+        <div>
+          <label htmlFor="from" className="block text-xs text-muted mb-1">From</label>
+          <input type="date" id="from" name="from" required defaultValue={monthStart} className="rounded border border-line bg-white px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label htmlFor="to" className="block text-xs text-muted mb-1">To</label>
+          <input type="date" id="to" name="to" required defaultValue={todayManila()} className="rounded border border-line bg-white px-3 py-2 text-sm" />
+        </div>
+        <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Download report</button>
+      </form>
 
       <form className="mb-5 flex flex-wrap items-center gap-2">
         <input type="date" name="date" defaultValue={date} className="rounded border border-line bg-white px-3 py-2 text-sm" />
@@ -51,8 +71,8 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
                     <Link href={`/employees/${a.employee_id}`} className="font-medium hover:underline underline-offset-2">{a.employee?.full_name}</Link>
                     <p className="text-xs text-muted">{a.employee?.employee_code}</p>
                   </td>
-                  <td className="px-4 py-3 tnum">{formatClock(a.time_in)}</td>
-                  <td className="px-4 py-3 tnum">{formatClock(a.time_out)}</td>
+                  <td className="px-4 py-3 tnum">{formatClock(a.clock_in_at)}</td>
+                  <td className="px-4 py-3 tnum">{formatClock(a.clock_out_at)}</td>
                   <td className="px-4 py-3 tnum">{formatDuration(a)}</td>
                   <td className="px-4 py-3 text-xs text-muted">{a.notes || "—"}</td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">

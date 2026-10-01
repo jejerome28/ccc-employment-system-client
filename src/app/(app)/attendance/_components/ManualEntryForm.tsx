@@ -30,14 +30,14 @@ export function ManualEntryForm({ employees, date }: { employees: Employee[]; da
           <FieldError errors={state?.errors} name="work_date" />
         </div>
         <div>
-          <label htmlFor="time_in" className="block text-sm font-medium mb-1">Time in</label>
-          <input id="time_in" name="time_in" type="time" defaultValue={state?.values?.time_in} className={input} />
-          <FieldError errors={state?.errors} name="time_in" />
+          <label htmlFor="clock_in_at" className="block text-sm font-medium mb-1">Time in</label>
+          <input id="clock_in_at" name="clock_in_at" type="time" defaultValue={state?.values?.clock_in_at} className={input} />
+          <FieldError errors={state?.errors} name="clock_in_at" />
         </div>
         <div>
-          <label htmlFor="time_out" className="block text-sm font-medium mb-1">Time out</label>
-          <input id="time_out" name="time_out" type="time" defaultValue={state?.values?.time_out} className={input} />
-          <FieldError errors={state?.errors} name="time_out" />
+          <label htmlFor="clock_out_at" className="block text-sm font-medium mb-1">Time out</label>
+          <input id="clock_out_at" name="clock_out_at" type="time" defaultValue={state?.values?.clock_out_at} className={input} />
+          <FieldError errors={state?.errors} name="clock_out_at" />
         </div>
         <div className="lg:col-span-4">
           <label htmlFor="notes" className="block text-sm font-medium mb-1">Notes <span className="text-muted font-normal">(optional)</span></label>

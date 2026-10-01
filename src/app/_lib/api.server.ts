@@ -11,14 +11,15 @@ type Init = { method?: "GET" | "POST" | "PUT" | "DELETE"; body?: unknown };
 
 export async function apiFetch<T>(path: string, init: Init = {}): Promise<ApiResult<T>> {
   const token = await getToken();
+  const form = init.body instanceof FormData;
   const headers: Record<string, string> = { Accept: "application/json" };
-  if (init.body !== undefined) headers["Content-Type"] = "application/json";
+  if (init.body !== undefined && !form) headers["Content-Type"] = "application/json";
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const res = await fetch(`${process.env.API_URL}${path}`, {
     method: init.method ?? "GET",
     headers,
-    body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
+    body: init.body === undefined ? undefined : form ? (init.body as FormData) : JSON.stringify(init.body),
     cache: "no-store",
   });
 

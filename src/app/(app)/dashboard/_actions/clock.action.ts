@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { apiFetch } from "@/app/_lib/api.server";
+import { todayManila } from "@/app/_lib/format";
 import type { ActionState } from "@/app/_lib/types";
 
 export async function clock(
@@ -10,7 +11,7 @@ export async function clock(
   _prev: ActionState,
   _formData: FormData,
 ): Promise<ActionState> {
-  const r = await apiFetch(`/api/employees/${employeeId}/${kind}`, { method: "POST" });
+  const r = await apiFetch(`/api/employees/${employeeId}/${kind}`, { method: "POST", body: { work_date: todayManila() } });
   if (!r.ok) return { error: r.message };
 
   revalidatePath("/dashboard");

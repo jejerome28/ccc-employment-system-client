@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { apiData } from "@/app/_lib/api.server";
-import { formatClock } from "@/app/_lib/format";
+import { formatClock, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import type { Employee, Paginated } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
@@ -14,7 +14,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
   const status = param(sp.status);
   const page = param(sp.page) || "1";
 
-  const query = new URLSearchParams({ page, ...(q && { q }), ...(status && { status }) });
+  const query = new URLSearchParams({ page, date: todayManila(), ...(q && { q }), ...(status && { status }) });
   const { items, meta } = await apiData<Paginated<Employee>>(`/api/employees?${query}`);
   const pageHref = (n: number) => `/employees?${new URLSearchParams({ page: String(n), ...(q && { q }), ...(status && { status }) })}`;
 
@@ -68,7 +68,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
                   <td className="px-4 py-3">{e.position || "—"}</td>
                   <td className="px-4 py-3">{e.department || "—"}</td>
                   <td className="px-4 py-3 tnum text-xs">
-                    {formatClock(e.today_attendance?.time_in)} – {formatClock(e.today_attendance?.time_out)}
+                    {formatClock(e.today_attendance?.clock_in_at)} – {formatClock(e.today_attendance?.clock_out_at)}
                   </td>
                   <td className="px-4 py-3">
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${e.status === "active" ? "bg-moss/10 text-moss" : "bg-ink/10 text-muted"}`}>
