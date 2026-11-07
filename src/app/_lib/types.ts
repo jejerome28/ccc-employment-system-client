@@ -5,6 +5,8 @@ export type Attendance = {
   clock_in_at: string | null;
   clock_out_at: string | null;
   notes: string | null;
+  remark: "ob" | "leave" | null;
+  remark_part: "whole" | "am" | "pm" | null;
   worked_minutes: number | null;
   timetable: string | null;
   status: string | null;
@@ -42,6 +44,7 @@ export type Paginated<T> = {
 };
 
 export type DashboardData = {
+  date: string;
   stats: { employees: number; active: number; clocked_in: number; completed: number; not_in: number };
   hours_today: number;
   employees: Employee[];
@@ -55,9 +58,38 @@ export type EmployeeDetail = {
 };
 
 export type AttendanceDay = {
+  date: string;
   attendances: Attendance[];
   total_minutes: number;
   employees: Employee[];
+};
+
+export type SummaryNumbers = {
+  present: number;
+  absent: number;
+  late_count: number;
+  late_minutes: number;
+  undertime_minutes: number;
+  ot_minutes: number;
+  ob: number;
+  leave: number;
+  needs_check: number;
+};
+
+export type SummaryRow = SummaryNumbers & {
+  employee_id: number;
+  person_id: string | null;
+  name: string;
+  department: string | null;
+};
+
+export type Summary = {
+  from: string;
+  to: string;
+  computed_through: string | null;
+  rows: SummaryRow[];
+  totals: SummaryNumbers;
+  needs_check: { employee_id: number; name: string; work_date: string; punch: string }[];
 };
 
 export type FieldErrors = Record<string, string[]>;

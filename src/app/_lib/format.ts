@@ -57,3 +57,14 @@ export function todayManila(): string {
 export function thisMonthManila(): string {
   return todayManila().slice(0, 7);
 }
+
+export function cutoffRange(month: string, half: 1 | 2): { from: string; to: string } {
+  const [y, m] = month.split("-").map(Number);
+  const last = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  return half === 1 ? { from: `${month}-01`, to: `${month}-15` } : { from: `${month}-16`, to: `${month}-${pad(last)}` };
+}
+
+export function currentCutoff(): { from: string; to: string } {
+  const today = todayManila();
+  return cutoffRange(today.slice(0, 7), Number(today.slice(8)) <= 15 ? 1 : 2);
+}

@@ -6,23 +6,26 @@ import type { DashboardData } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
 import { ClockButton } from "./_components/ClockButton";
 
+const CLOCK_BUTTONS = false;
+
 export const metadata: Metadata = { title: "Today" };
 
 export default async function DashboardPage() {
-  const { stats, hours_today, employees } = await apiData<DashboardData>(`/api/dashboard?date=${todayManila()}`);
+  const { date, stats, hours_today, employees } = await apiData<DashboardData>("/api/dashboard");
+  const isToday = date === todayManila();
 
   const cards = [
     { label: "On the clock now", value: stats.clocked_in, tone: "text-clay" },
     { label: "Finished for the day", value: stats.completed, tone: "text-moss" },
-    { label: "Not yet in", value: stats.not_in, tone: "text-muted" },
-    { label: "Hours logged today", value: hours_today.toFixed(2), tone: "text-ink" },
+    { label: "No punches", value: stats.not_in, tone: "text-muted" },
+    { label: "Hours logged", value: hours_today.toFixed(2), tone: "text-ink" },
   ];
 
   return (
     <>
       <PageHeader
-        title="Today"
-        subtitle={formatDate(todayManila(), "long")}
+        title={isToday ? "Today" : "Latest imported day"}
+        subtitle={formatDate(date, "long")}
         actions={
           <Link href="/attendance" className="inline-block rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">
             Open time records
@@ -58,7 +61,7 @@ export default async function DashboardPage() {
                 <th className="px-4 py-2 font-medium">Time in</th>
                 <th className="px-4 py-2 font-medium">Time out</th>
                 <th className="px-4 py-2 font-medium">Worked</th>
-                <th className="px-4 py-2 font-medium text-right">Clock</th>
+                {CLOCK_BUTTONS && <th className="px-4 py-2 font-medium text-right">Clock</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -73,7 +76,7 @@ export default async function DashboardPage() {
                     <td className="px-4 py-3 tnum">{formatClock(log?.clock_in_at)}</td>
                     <td className="px-4 py-3 tnum">{formatClock(log?.clock_out_at)}</td>
                     <td className={`px-4 py-3 tnum ${log?.clock_in_at && !log.clock_out_at ? "text-clay" : ""}`}>{formatDuration(log)}</td>
-                    <td className="px-4 py-3">
+                    {CLOCK_BUTTONS && <td className="px-4 py-3">
                       <div className="flex justify-end">
                         {!log?.clock_in_at ? (
                           <ClockButton employeeId={e.id} kind="time-in" />
@@ -83,7 +86,7 @@ export default async function DashboardPage() {
                           <span className="text-xs text-muted">Done for today</span>
                         )}
                       </div>
-                    </td>
+                    </td>}
                   </tr>
                 );
               })}

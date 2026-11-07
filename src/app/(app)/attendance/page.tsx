@@ -6,18 +6,19 @@ import { param } from "@/app/_lib/params";
 import type { AttendanceDay } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
 import { ManualEntryForm } from "./_components/ManualEntryForm";
+import { remarkLabel } from "./_components/RemarkFields";
 
 export const metadata: Metadata = { title: "Time records" };
 
 export default async function AttendancePage(props: PageProps<"/attendance">) {
   const sp = await props.searchParams;
-  const date = param(sp.date) || todayManila();
+  const picked = param(sp.date);
   const q = param(sp.q);
   const exportError = param(sp.export_error);
   const monthStart = `${todayManila().slice(0, 8)}01`;
 
-  const { attendances, total_minutes, employees } = await apiData<AttendanceDay>(
-    `/api/attendance?${new URLSearchParams({ date, ...(q && { q }) })}`,
+  const { date, attendances, total_minutes, employees } = await apiData<AttendanceDay>(
+    `/api/attendance?${new URLSearchParams({ ...(picked && { date: picked }), ...(q && { q }) })}`,
   );
 
   return (
@@ -46,7 +47,8 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
         <input type="date" name="date" defaultValue={date} className="rounded border border-line bg-white px-3 py-2 text-sm" />
         <input type="search" name="q" defaultValue={q} placeholder="Filter by employee" className="flex-1 min-w-48 rounded border border-line bg-white px-3 py-2 text-sm" />
         <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Show</button>
-        <Link href="/attendance" className="px-3 py-2 text-sm text-muted underline underline-offset-2">Today</Link>
+        <Link href={`/attendance?date=${todayManila()}`} className="px-3 py-2 text-sm text-muted underline underline-offset-2">Today</Link>
+        <Link href="/attendance" className="px-3 py-2 text-sm text-muted underline underline-offset-2">Latest</Link>
       </form>
 
       <div className="bg-white border border-line rounded overflow-x-auto mb-8">
@@ -74,7 +76,10 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
                   <td className="px-4 py-3 tnum">{formatClock(a.clock_in_at)}</td>
                   <td className="px-4 py-3 tnum">{formatClock(a.clock_out_at)}</td>
                   <td className="px-4 py-3 tnum">{formatDuration(a)}</td>
-                  <td className="px-4 py-3 text-xs text-muted">{a.notes || "—"}</td>
+                  <td className="px-4 py-3 text-xs text-muted">
+                    {remarkLabel(a) && <span className="mr-2 rounded bg-moss/10 px-1.5 py-0.5 font-semibold text-moss">{remarkLabel(a)}</span>}
+                    {a.notes || (remarkLabel(a) ? "" : "—")}
+                  </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <Link href={`/attendance/${a.id}/edit`} className="text-xs font-semibold underline underline-offset-2">Edit</Link>
                   </td>
@@ -95,7 +100,7 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
 
       <h2 className="font-semibold mb-2">Add or correct a record</h2>
       <p className="text-sm text-muted mb-3">
-        Use this when someone forgot to clock in, or to fix a wrong time. Saving overwrites the record for that employee and date.
+        Use this when someone forgot to clock in, to fix a wrong time, or to mark official business or leave (leave the times empty for a whole day). Saving overwrites the record for that employee and date.
       </p>
       <ManualEntryForm employees={employees} date={date} />
     </>
