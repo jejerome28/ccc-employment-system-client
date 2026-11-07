@@ -5,6 +5,7 @@ import type { Employee } from "@/app/_lib/types";
 import { FieldError } from "../../_components/FieldError";
 import { Notice } from "../../_components/Notice";
 import { saveAttendance } from "../_actions/attendance.action";
+import { RemarkFields } from "./RemarkFields";
 
 const input = "w-full rounded border border-line px-3 py-2 text-sm";
 
@@ -39,7 +40,8 @@ export function ManualEntryForm({ employees, date }: { employees: Employee[]; da
           <input id="clock_out_at" name="clock_out_at" type="time" defaultValue={state?.values?.clock_out_at} className={input} />
           <FieldError errors={state?.errors} name="clock_out_at" />
         </div>
-        <div className="lg:col-span-4">
+        <RemarkFields state={state} />
+        <div className="lg:col-span-3">
           <label htmlFor="notes" className="block text-sm font-medium mb-1">Notes <span className="text-muted font-normal">(optional)</span></label>
           <input id="notes" name="notes" type="text" maxLength={255} defaultValue={state?.values?.notes} placeholder="Half day, field work, forgot to clock out" className={input} />
         </div>

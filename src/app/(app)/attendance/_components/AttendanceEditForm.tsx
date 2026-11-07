@@ -7,6 +7,7 @@ import { toClockInput } from "@/app/_lib/format";
 import { FieldError } from "../../_components/FieldError";
 import { Notice } from "../../_components/Notice";
 import { updateAttendance } from "../_actions/attendance.action";
+import { RemarkFields } from "./RemarkFields";
 
 const input = "w-full rounded border border-line px-3 py-2 text-sm";
 
@@ -27,6 +28,7 @@ export function AttendanceEditForm({ attendance: a }: { attendance: Attendance }
           <input id="clock_out_at" name="clock_out_at" type="time" defaultValue={state?.values?.clock_out_at ?? toClockInput(a.clock_out_at)} className={input} />
           <FieldError errors={state?.errors} name="clock_out_at" />
         </div>
+        <RemarkFields state={state} attendance={a} />
         <div className="sm:col-span-2">
           <label htmlFor="notes" className="block text-sm font-medium mb-1">Notes <span className="text-muted font-normal">(optional)</span></label>
           <input id="notes" name="notes" type="text" maxLength={255} defaultValue={state?.values?.notes ?? a.notes ?? ""} className={input} />

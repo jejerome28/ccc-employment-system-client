@@ -13,8 +13,8 @@ export function ImportForm() {
     <>
       <form action={action} className="bg-white border border-line rounded p-5 flex flex-wrap items-end gap-4 mb-6">
         <div className="flex-1 min-w-64">
-          <label htmlFor="file" className="block text-sm font-medium mb-1">Attendance report (CSV)</label>
-          <input id="file" name="file" type="file" accept=".csv,text/csv" required className="block w-full text-sm" />
+          <label htmlFor="file" className="block text-sm font-medium mb-1">Attendance report (.csv or Excel .xlsx)</label>
+          <input id="file" name="file" type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required className="block w-full text-sm" />
         </div>
         <button disabled={pending} className="rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90 disabled:opacity-60">
           {pending ? "Importing…" : "Import"}

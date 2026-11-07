@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { apiData } from "@/app/_lib/api.server";
-import { formatClock, todayManila } from "@/app/_lib/format";
+import { formatClock, formatDate, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import type { Employee, Paginated } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
@@ -14,8 +14,8 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
   const status = param(sp.status);
   const page = param(sp.page) || "1";
 
-  const query = new URLSearchParams({ page, date: todayManila(), ...(q && { q }), ...(status && { status }) });
-  const { items, meta } = await apiData<Paginated<Employee>>(`/api/employees?${query}`);
+  const query = new URLSearchParams({ page, ...(q && { q }), ...(status && { status }) });
+  const { date, items, meta } = await apiData<Paginated<Employee> & { date: string }>(`/api/employees?${query}`);
   const pageHref = (n: number) => `/employees?${new URLSearchParams({ page: String(n), ...(q && { q }), ...(status && { status }) })}`;
 
   return (
@@ -50,7 +50,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
               <th className="px-4 py-2 font-medium">Name</th>
               <th className="px-4 py-2 font-medium">Position</th>
               <th className="px-4 py-2 font-medium">Department</th>
-              <th className="px-4 py-2 font-medium">Today</th>
+              <th className="px-4 py-2 font-medium">{date === todayManila() ? "Today" : formatDate(date, "short")}</th>
               <th className="px-4 py-2 font-medium">Status</th>
               <th className="px-4 py-2" />
             </tr>

@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// Needs the backend running with `php artisan migrate:fresh --seed` (seed has no attendance for today).
-test("guest is sent to login, admin can sign in, time someone in, and sign out", async ({ page }) => {
+test("guest is sent to login, admin can sign in without clock buttons, and sign out", async ({ page }) => {
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/login$/);
 
@@ -15,16 +14,8 @@ test("guest is sent to login, admin can sign in, time someone in, and sign out",
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole("heading", { name: "Today" })).toBeVisible();
 
-  const timeInButtons = page.getByRole("button", { name: "Time in" });
-  const before = await timeInButtons.count();
-  await timeInButtons.first().click();
-  await expect(timeInButtons).toHaveCount(before - 1);
-  await expect(page.getByRole("button", { name: "Time out" }).first()).toBeVisible();
-
-  const manilaNow = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Manila", hour: "numeric", hour12: true })
-    .formatToParts(new Date())
-    .find((p) => p.type === "hour")!.value;
-  await expect(page.getByRole("cell", { name: new RegExp(`^${manilaNow}:\\d{2} (AM|PM)$`) }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Time in" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Time out" })).toHaveCount(0);
 
   const cookies = await page.context().cookies();
   expect(cookies.find((c) => c.name === "ccc_token")?.httpOnly).toBe(true);

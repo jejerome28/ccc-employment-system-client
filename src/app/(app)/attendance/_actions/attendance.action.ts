@@ -16,6 +16,11 @@ function nextDay(ymd: string): string {
   return d.toISOString().slice(0, 10);
 }
 
+function remark(fd: FormData) {
+  const value = opt(fd, "remark");
+  return { remark: value, remark_part: value ? opt(fd, "remark_part") : null };
+}
+
 function clocks(fd: FormData, workDate: string) {
   const inAt = opt(fd, "clock_in_at");
   const outAt = opt(fd, "clock_out_at");
@@ -27,6 +32,7 @@ function clocks(fd: FormData, workDate: string) {
     clock_in_at: iso(workDate, inAt),
     clock_out_at: iso(dateOk && overnight ? nextDay(workDate) : workDate, outAt),
     notes: opt(fd, "notes"),
+    ...remark(fd),
   };
 }
 
