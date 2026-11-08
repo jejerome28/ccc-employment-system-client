@@ -2,22 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Role } from "@/app/_lib/types";
 
 const NAV = [
   { href: "/dashboard", label: "Today" },
   { href: "/employees", label: "Employees" },
   { href: "/attendance", label: "Time records" },
   { href: "/attendance/summary", label: "Cutoff summary" },
-  { href: "/attendance/import", label: "Import" },
+  { href: "/attendance/import", label: "Import", admin: true },
+  { href: "/users", label: "Users", admin: true },
 ];
 
-export function NavLinks() {
+export function NavLinks({ role }: { role: Role }) {
   const pathname = usePathname();
+  const links = NAV.filter((n) => !n.admin || role === "admin");
 
   return (
     <nav className="px-3 pb-4 flex lg:block gap-1 overflow-x-auto">
-      {NAV.map(({ href, label }) => {
-        const deeper = NAV.some((n) => n.href.length > href.length && pathname.startsWith(n.href));
+      {links.map(({ href, label }) => {
+        const deeper = links.some((n) => n.href.length > href.length && pathname.startsWith(n.href));
         const active = pathname === href || (pathname.startsWith(`${href}/`) && !deeper);
         return (
           <Link

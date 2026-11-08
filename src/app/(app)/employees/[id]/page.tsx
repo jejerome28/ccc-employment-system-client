@@ -2,15 +2,20 @@ import Link from "next/link";
 import { apiData } from "@/app/_lib/api.server";
 import { formatClock, formatDate, formatDuration, formatMinutes, thisMonthManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
-import type { EmployeeDetail } from "@/app/_lib/types";
+import { canEdit, currentUser } from "@/app/_lib/role";
+import type { EmployeeCalendar, EmployeeDetail } from "@/app/_lib/types";
+import { AttendanceCalendar } from "./_components/AttendanceCalendar";
 import { PageHeader } from "../../_components/PageHeader";
 
 export default async function EmployeePage(props: PageProps<"/employees/[id]">) {
   const { id } = await props.params;
+  const { role } = await currentUser();
   const month = param((await props.searchParams).month) || thisMonthManila();
-  const { employee: e, attendances, total_minutes, days_present } = await apiData<EmployeeDetail>(
-    `/api/employees/${id}?month=${encodeURIComponent(month)}`,
-  );
+  const q = encodeURIComponent(month);
+  const [{ employee: e, attendances, total_minutes, days_present }, cal] = await Promise.all([
+    apiData<EmployeeDetail>(`/api/employees/${id}?month=${q}`),
+    apiData<EmployeeCalendar>(`/api/employees/${id}/calendar?month=${q}`),
+  ]);
 
   const details: [string, string][] = [
     ["Department", e.department || "—"],
@@ -26,9 +31,11 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
         title={e.full_name}
         subtitle={`${e.employee_code} · ${e.position || "No position set"}`}
         actions={
-          <Link href={`/employees/${e.id}/edit`} className="inline-block rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">
-            Edit details
-          </Link>
+          canEdit(role) && (
+            <Link href={`/employees/${e.id}/edit`} className="inline-block rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">
+              Edit details
+            </Link>
+          )
         }
       />
       <div className="grid lg:grid-cols-3 gap-6">
@@ -42,6 +49,7 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
         </div>
 
         <div className="lg:col-span-2 space-y-4">
+          <AttendanceCalendar cal={cal} canEdit={canEdit(role)} />
           <form className="flex flex-wrap items-center gap-2">
             <label htmlFor="month" className="text-sm text-muted">Month</label>
             <input type="month" id="month" name="month" defaultValue={month} className="rounded border border-line bg-white px-3 py-2 text-sm" />
@@ -75,7 +83,7 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
                       <td className="px-4 py-3 tnum">{formatDuration(a)}</td>
                       <td className="px-4 py-3 text-muted text-xs">{a.notes || "—"}</td>
                       <td className="px-4 py-3 text-right">
-                        <Link href={`/attendance/${a.id}/edit`} className="text-xs font-semibold underline underline-offset-2">Edit</Link>
+                        {canEdit(role) && <Link href={`/attendance/${a.id}/edit`} className="text-xs font-semibold underline underline-offset-2">Edit</Link>}
                       </td>
                     </tr>
                   ))

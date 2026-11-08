@@ -3,6 +3,7 @@ import Link from "next/link";
 import { apiData } from "@/app/_lib/api.server";
 import { formatClock, formatDate, formatDuration, formatMinutes, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
+import { canEdit, currentUser } from "@/app/_lib/role";
 import type { AttendanceDay } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
 import { ManualEntryForm } from "./_components/ManualEntryForm";
@@ -15,6 +16,7 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
   const picked = param(sp.date);
   const q = param(sp.q);
   const exportError = param(sp.export_error);
+  const { role } = await currentUser();
   const monthStart = `${todayManila().slice(0, 8)}01`;
 
   const { date, attendances, total_minutes, employees } = await apiData<AttendanceDay>(
@@ -81,7 +83,7 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
                     {a.notes || (remarkLabel(a) ? "" : "—")}
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
-                    <Link href={`/attendance/${a.id}/edit`} className="text-xs font-semibold underline underline-offset-2">Edit</Link>
+                    {canEdit(role) && <Link href={`/attendance/${a.id}/edit`} className="text-xs font-semibold underline underline-offset-2">Edit</Link>}
                   </td>
                 </tr>
               ))
@@ -98,11 +100,15 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
         </table>
       </div>
 
+      {canEdit(role) && (
+        <>
       <h2 className="font-semibold mb-2">Add or correct a record</h2>
       <p className="text-sm text-muted mb-3">
         Use this when someone forgot to clock in, to fix a wrong time, or to mark official business or leave (leave the times empty for a whole day). Saving overwrites the record for that employee and date.
       </p>
       <ManualEntryForm employees={employees} date={date} />
+        </>
+      )}
     </>
   );
 }

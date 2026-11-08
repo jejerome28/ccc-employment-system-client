@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { apiData } from "@/app/_lib/api.server";
 import { formatDate } from "@/app/_lib/format";
+import { canEdit, currentUser } from "@/app/_lib/role";
 import type { Attendance } from "@/app/_lib/types";
 import { DeleteButton } from "../../../_components/DeleteButton";
 import { PageHeader } from "../../../_components/PageHeader";
@@ -11,6 +13,7 @@ export const metadata: Metadata = { title: "Edit time record" };
 
 export default async function EditAttendancePage(props: PageProps<"/attendance/[id]/edit">) {
   const { id } = await props.params;
+  if (!canEdit((await currentUser()).role)) notFound();
   const { attendance } = await apiData<{ attendance: Attendance }>(`/api/attendance/${id}`);
 
   return (

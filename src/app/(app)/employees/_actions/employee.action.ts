@@ -25,3 +25,11 @@ export async function deleteEmployee(id: number): Promise<void> {
   revalidatePath("/employees");
   redirect("/employees");
 }
+
+export async function restoreEmployee(id: number): Promise<void> {
+  const r = await apiFetch(`/api/employees/${id}/restore`, { method: "POST" });
+  if (!r.ok) throw new Error(r.message);
+
+  revalidatePath("/employees");
+  redirect("/employees?archived=1");
+}
