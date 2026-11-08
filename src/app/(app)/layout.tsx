@@ -1,12 +1,11 @@
 import type { ReactNode } from "react";
-import { apiData } from "@/app/_lib/api.server";
 import { formatDate, todayManila } from "@/app/_lib/format";
-import type { User } from "@/app/_lib/types";
+import { currentUser } from "@/app/_lib/role";
 import { NavLinks } from "./_components/NavLinks";
 import { logout } from "./_actions/logout.action";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const { user } = await apiData<{ user: User }>("/api/me");
+  const user = await currentUser();
 
   return (
     <div className="min-h-full lg:flex">
@@ -15,7 +14,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <p className="text-base font-bold leading-tight">Staff Time Records</p>
           <p className="text-xs text-canvas/60 tnum">{formatDate(todayManila(), "medium")}</p>
         </div>
-        <NavLinks />
+        <NavLinks role={user.role} />
         <div className="px-5 py-4 border-t border-white/10 lg:mt-auto">
           <p className="text-sm font-medium">{user.name}</p>
           <p className="text-xs text-canvas/55 mb-2">{user.email}</p>

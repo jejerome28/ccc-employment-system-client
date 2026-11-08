@@ -33,10 +33,13 @@ export type Employee = {
   department: string | null;
   hire_date: string | null; // Y-m-d
   status: "active" | "inactive";
+  archived_at: string | null;
   today_attendance?: Attendance | null;
 };
 
-export type User = { id: number; name: string; email: string };
+export type Role = "admin" | "hr" | "viewer";
+
+export type User = { id: number; name: string; email: string; role: Role };
 
 export type Paginated<T> = {
   items: T[];
@@ -99,3 +102,35 @@ export type FieldErrors = Record<string, string[]>;
 export type ActionState =
   | { message?: string; error?: string; errors?: FieldErrors; values?: Record<string, string> }
   | undefined;
+
+export type CalendarStatus =
+  | "complete" | "late" | "undertime" | "overtime" | "absent" | "ob" | "leave"
+  | "needs_check" | "off" | "holiday" | "future" | "in_progress" | "rest_day_worked";
+
+export type CalendarDay = {
+  date: string;
+  day: number;
+  weekday: number;
+  status: CalendarStatus;
+  label: string;
+  flags: CalendarStatus[];
+  clock_in: string | null;
+  clock_out: string | null;
+  remark: string | null;
+  attendance_id: number | null;
+  late_minutes: number;
+  undertime_minutes: number;
+  ot_minutes: number;
+};
+
+export type EmployeeCalendar = {
+  employee: { id: number; full_name: string };
+  month: string;
+  prev_month: string;
+  next_month: string;
+  first_weekday: number;
+  days: CalendarDay[];
+  totals: Record<"complete" | "late" | "undertime" | "overtime" | "absent" | "ob" | "leave" | "needs_check", number> &
+    Record<"late_minutes" | "undertime_minutes" | "ot_minutes", number>;
+  legend: { status: CalendarStatus; label: string }[];
+};

@@ -3,8 +3,10 @@ import Link from "next/link";
 import { apiData } from "@/app/_lib/api.server";
 import { formatClock, formatDate, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
+import { canEdit, currentUser, isAdmin } from "@/app/_lib/role";
 import type { Employee, Paginated } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
+import { restoreEmployee } from "./_actions/employee.action";
 
 export const metadata: Metadata = { title: "Employees" };
 
@@ -13,10 +15,12 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
   const q = param(sp.q);
   const status = param(sp.status);
   const page = param(sp.page) || "1";
+  const archived = param(sp.archived) === "1";
+  const { role } = await currentUser();
 
-  const query = new URLSearchParams({ page, ...(q && { q }), ...(status && { status }) });
+  const query = new URLSearchParams({ page, ...(q && { q }), ...(status && { status }), ...(archived && { archived: "1" }) });
   const { date, items, meta } = await apiData<Paginated<Employee> & { date: string }>(`/api/employees?${query}`);
-  const pageHref = (n: number) => `/employees?${new URLSearchParams({ page: String(n), ...(q && { q }), ...(status && { status }) })}`;
+  const pageHref = (n: number) => `/employees?${new URLSearchParams({ page: String(n), ...(q && { q }), ...(status && { status }), ...(archived && { archived: "1" }) })}`;
 
   return (
     <>
@@ -24,13 +28,21 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
         title="Employees"
         subtitle={`${meta.total} records`}
         actions={
-          <Link href="/employees/new" className="inline-block rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90">
-            Add employee
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href={archived ? "/employees" : "/employees?archived=1"} className="text-sm text-muted underline underline-offset-2">
+              {archived ? "Show active" : "Show archived"}
+            </Link>
+            {canEdit(role) && !archived && (
+              <Link href="/employees/new" className="inline-block rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90">
+                Add employee
+              </Link>
+            )}
+          </div>
         }
       />
 
       <form className="mb-5 flex flex-wrap gap-2">
+        {archived && <input type="hidden" name="archived" value="1" />}
         <input type="search" name="q" defaultValue={q} placeholder="Search name, code, department"
           className="flex-1 min-w-52 rounded border border-line bg-white px-3 py-2 text-sm focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink" />
         <select name="status" defaultValue={status} className="rounded border border-line bg-white px-3 py-2 text-sm">
@@ -39,7 +51,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
           <option value="inactive">Inactive</option>
         </select>
         <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Search</button>
-        {(q || status) && <Link href="/employees" className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
+        {(q || status) && <Link href={archived ? "/employees?archived=1" : "/employees"} className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
       </form>
 
       <div className="bg-white border border-line rounded overflow-x-auto">
@@ -63,7 +75,11 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
                 <tr key={e.id}>
                   <td className="px-4 py-3 tnum text-muted">{e.employee_code}</td>
                   <td className="px-4 py-3">
-                    <Link href={`/employees/${e.id}`} className="font-medium hover:underline underline-offset-2">{e.full_name}</Link>
+                    {archived ? (
+                      <span className="font-medium text-muted">{e.full_name}</span>
+                    ) : (
+                      <Link href={`/employees/${e.id}`} className="font-medium hover:underline underline-offset-2">{e.full_name}</Link>
+                    )}
                   </td>
                   <td className="px-4 py-3">{e.position || "—"}</td>
                   <td className="px-4 py-3">{e.department || "—"}</td>
@@ -76,7 +92,15 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/employees/${e.id}/edit`} className="text-xs font-semibold underline underline-offset-2">Edit</Link>
+                    {archived ? (
+                      isAdmin(role) && (
+                        <form action={restoreEmployee.bind(null, e.id)}>
+                          <button className="text-xs font-semibold underline underline-offset-2">Restore</button>
+                        </form>
+                      )
+                    ) : (
+                      canEdit(role) && <Link href={`/employees/${e.id}/edit`} className="text-xs font-semibold underline underline-offset-2">Edit</Link>
+                    )}
                   </td>
                 </tr>
               ))
