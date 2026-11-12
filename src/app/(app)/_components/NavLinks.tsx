@@ -11,6 +11,7 @@ const NAV = [
   { href: "/attendance/summary", label: "Cutoff summary" },
   { href: "/attendance/import", label: "Import", admin: true },
   { href: "/users", label: "Users", admin: true },
+  { href: "/settings/reports", label: "Report settings", admin: true },
 ];
 
 export function NavLinks({ role }: { role: Role }) {

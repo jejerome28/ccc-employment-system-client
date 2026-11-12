@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { apiData } from "@/app/_lib/api.server";
+import { GROUPS, groupLabel } from "@/app/_lib/groups";
 import { formatClock, formatDate, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import { canEdit, currentUser, isAdmin } from "@/app/_lib/role";
@@ -14,13 +15,14 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
   const sp = await props.searchParams;
   const q = param(sp.q);
   const status = param(sp.status);
+  const group = param(sp.group);
   const page = param(sp.page) || "1";
   const archived = param(sp.archived) === "1";
   const { role } = await currentUser();
 
-  const query = new URLSearchParams({ page, ...(q && { q }), ...(status && { status }), ...(archived && { archived: "1" }) });
+  const query = new URLSearchParams({ page, ...(q && { q }), ...(status && { status }), ...(group && { group }), ...(archived && { archived: "1" }) });
   const { date, items, meta } = await apiData<Paginated<Employee> & { date: string }>(`/api/employees?${query}`);
-  const pageHref = (n: number) => `/employees?${new URLSearchParams({ page: String(n), ...(q && { q }), ...(status && { status }), ...(archived && { archived: "1" }) })}`;
+  const pageHref = (n: number) => `/employees?${new URLSearchParams({ page: String(n), ...(q && { q }), ...(status && { status }), ...(group && { group }), ...(archived && { archived: "1" }) })}`;
 
   return (
     <>
@@ -50,8 +52,13 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
+        <select name="group" defaultValue={group} className="rounded border border-line bg-white px-3 py-2 text-sm">
+          <option value="">All groups</option>
+          {GROUPS.map((g) => <option key={g.value} value={g.value}>{g.label}</option>)}
+          <option value="none">Not set</option>
+        </select>
         <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Search</button>
-        {(q || status) && <Link href={archived ? "/employees?archived=1" : "/employees"} className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
+        {(q || status || group) && <Link href={archived ? "/employees?archived=1" : "/employees"} className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
       </form>
 
       <div className="bg-white border border-line rounded overflow-x-auto">
@@ -62,6 +69,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
               <th className="px-4 py-2 font-medium">Name</th>
               <th className="px-4 py-2 font-medium">Position</th>
               <th className="px-4 py-2 font-medium">Department</th>
+              <th className="px-4 py-2 font-medium">Group</th>
               <th className="px-4 py-2 font-medium">{date === todayManila() ? "Today" : formatDate(date, "short")}</th>
               <th className="px-4 py-2 font-medium">Status</th>
               <th className="px-4 py-2" />
@@ -69,7 +77,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
           </thead>
           <tbody className="divide-y divide-line">
             {items.length === 0 ? (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-muted">No employees match this search.</td></tr>
+              <tr><td colSpan={8} className="px-4 py-10 text-center text-sm text-muted">No employees match this search.</td></tr>
             ) : (
               items.map((e) => (
                 <tr key={e.id}>
@@ -83,6 +91,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
                   </td>
                   <td className="px-4 py-3">{e.position || "—"}</td>
                   <td className="px-4 py-3">{e.department || "—"}</td>
+                  <td className="px-4 py-3">{groupLabel(e.employment_group)}</td>
                   <td className="px-4 py-3 tnum text-xs">
                     {formatClock(e.today_attendance?.clock_in_at)} – {formatClock(e.today_attendance?.clock_out_at)}
                   </td>

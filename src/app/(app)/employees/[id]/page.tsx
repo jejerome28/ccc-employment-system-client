@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { apiData } from "@/app/_lib/api.server";
+import { groupLabel } from "@/app/_lib/groups";
 import { formatClock, formatDate, formatDuration, formatMinutes, thisMonthManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import { canEdit, currentUser } from "@/app/_lib/role";
@@ -19,6 +20,7 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
 
   const details: [string, string][] = [
     ["Department", e.department || "—"],
+    ["Group", groupLabel(e.employment_group)],
     ["Email", e.email || "—"],
     ["Phone", e.phone || "—"],
     ["Hired", e.hire_date ? formatDate(e.hire_date, "medium") : "—"],

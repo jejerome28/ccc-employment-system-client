@@ -1,5 +1,5 @@
 const REQUIRED = ["employee_code", "first_name", "last_name", "status"] as const;
-const OPTIONAL = ["email", "phone", "position", "department", "hire_date"] as const;
+const OPTIONAL = ["email", "phone", "position", "department", "hire_date", "employment_group"] as const;
 
 // Explicit keys only: the API rejects unknown fields, and FormData carries Next's $ACTION_* keys.
 export function employeeBody(fd: FormData): Record<string, string | null> {
