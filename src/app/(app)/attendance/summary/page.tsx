@@ -58,12 +58,21 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
         <Link href={qs(cutoffRange(month, 1))} className="px-3 py-2 text-sm underline underline-offset-2">1–15</Link>
         <Link href={qs(cutoffRange(month, 2))} className="px-3 py-2 text-sm underline underline-offset-2">16–end</Link>
         {r.ok && (
-          <a href={`/attendance/summary/export${qs({ from, to })}`} className={`${button} ml-auto`}>Download .xlsx</a>
+          <span className="ml-auto flex gap-2">
+            <a href={`/attendance/summary/export${qs({ from, to })}`} className={button}>Download review (.xlsx)</a>
+            <a href={`/attendance/summary/cra${qs({ from, to })}`} className={button}>Download CRA (.xlsx)</a>
+          </span>
         )}
       </form>
 
       {r.ok && (
         <>
+          {r.data.ungrouped_count > 0 && (
+            <div role="status" className="mb-4 rounded border border-line bg-white px-4 py-3 text-sm">
+              {r.data.ungrouped_count} employee(s) have no employment group. They appear under &quot;No group set&quot; in the CRA.{" "}
+              <Link href="/employees?group=none" className="font-semibold underline underline-offset-2">View</Link>
+            </div>
+          )}
           {r.data.computed_through === null ? (
             <p className="mb-4 text-sm text-muted">No attendance has been imported yet.</p>
           ) : (

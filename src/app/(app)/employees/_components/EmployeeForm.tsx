@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { GROUPS } from "@/app/_lib/groups";
 import type { Employee } from "@/app/_lib/types";
 import { FieldError } from "../../_components/FieldError";
 import { Notice } from "../../_components/Notice";
@@ -41,6 +42,14 @@ export function EmployeeForm({ employee, submitLabel }: { employee?: Employee; s
             <FieldError errors={state?.errors} name={name} />
           </div>
         ))}
+        <div>
+          <label htmlFor="employment_group" className="block text-sm font-medium mb-1">Employment group</label>
+          <select id="employment_group" name="employment_group" defaultValue={state?.values?.employment_group ?? employee?.employment_group ?? ""} className="w-full rounded border border-line px-3 py-2 text-sm">
+            <option value="">Not set</option>
+            {GROUPS.map((g) => <option key={g.value} value={g.value}>{g.label}</option>)}
+          </select>
+          <FieldError errors={state?.errors} name="employment_group" />
+        </div>
         <div>
           <label htmlFor="status" className="block text-sm font-medium mb-1">Status</label>
           <select id="status" name="status" defaultValue={state?.values?.status ?? employee?.status ?? "active"} className="w-full rounded border border-line px-3 py-2 text-sm">

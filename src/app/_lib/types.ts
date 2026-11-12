@@ -20,6 +20,8 @@ export type Attendance = {
   employee?: Employee;
 };
 
+export type EmploymentGroup = "permanent" | "cos_non_teaching" | "permanent_non_teaching" | "cos_teaching";
+
 export type Employee = {
   id: number;
   employee_code: string;
@@ -32,6 +34,7 @@ export type Employee = {
   position: string | null;
   department: string | null;
   hire_date: string | null; // Y-m-d
+  employment_group: EmploymentGroup | null;
   status: "active" | "inactive";
   archived_at: string | null;
   today_attendance?: Attendance | null;
@@ -84,12 +87,16 @@ export type SummaryRow = SummaryNumbers & {
   person_id: string | null;
   name: string;
   department: string | null;
+  employment_group: EmploymentGroup | null;
+  status: "active" | "inactive";
+  archived: boolean;
 };
 
 export type Summary = {
   from: string;
   to: string;
   computed_through: string | null;
+  ungrouped_count: number;
   rows: SummaryRow[];
   totals: SummaryNumbers;
   needs_check: { employee_id: number; name: string; work_date: string; punch: string }[];
@@ -134,3 +141,5 @@ export type EmployeeCalendar = {
     Record<"late_minutes" | "undertime_minutes" | "ot_minutes", number>;
   legend: { status: CalendarStatus; label: string }[];
 };
+
+export type ReportSignatory = { id: number; position: number; label: string; name: string; title: string };

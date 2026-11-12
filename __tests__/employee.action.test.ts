@@ -39,8 +39,15 @@ it("employeeBody maps blanks to null and only known keys", () => {
     position: "HR Officer",
     department: null,
     hire_date: null,
+    employment_group: null,
     status: "active",
   });
+});
+
+it("employeeBody passes a chosen employment group", () => {
+  const f = fd();
+  f.set("employment_group", "cos_teaching");
+  expect(employeeBody(f).employment_group).toBe("cos_teaching");
 });
 
 it("creates with POST and redirects to the new employee", async () => {
