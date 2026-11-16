@@ -56,7 +56,8 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
         <Link href="/attendance" className="px-3 py-2 text-sm text-muted underline underline-offset-2">Latest</Link>
       </form>
 
-      <div className="bg-white border border-line rounded overflow-x-auto mb-0">
+      <div className="mb-8">
+      <div className="bg-white border border-line rounded overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-left text-xs text-muted border-b border-line">
             <tr>
@@ -104,6 +105,7 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
       </div>
 
       <Pager meta={meta} href={pageHref} empty={attendances.length === 0} />
+      </div>
 
       {canEdit(role) && (
         <>

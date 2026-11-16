@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { param } from "@/app/_lib/params";
 import { apiData } from "@/app/_lib/api.server";
 import { formatClock, formatDate, formatDuration, todayManila } from "@/app/_lib/format";
+import { param } from "@/app/_lib/params";
 import { canEdit, currentUser } from "@/app/_lib/role";
 import type { DashboardData } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
@@ -66,8 +66,8 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
 
         {employees.length === 0 ? (
           <div className="px-4 py-10 text-center">
-            <p className="text-sm text-muted mb-3">No active employees yet.</p>
-            {canEdit(role) && <Link href="/employees/new" className="text-sm font-semibold underline underline-offset-2">Add your first employee</Link>}
+            <p className="text-sm text-muted mb-3">{q ? "No employees match this search." : "No active employees yet."}</p>
+            {!q && canEdit(role) && <Link href="/employees/new" className="text-sm font-semibold underline underline-offset-2">Add your first employee</Link>}
           </div>
         ) : (
           <table className="w-full text-sm">
