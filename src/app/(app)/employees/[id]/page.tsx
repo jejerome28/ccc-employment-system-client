@@ -54,7 +54,7 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
           <AttendanceCalendar cal={cal} canEdit={canEdit(role)} />
           <form className="flex flex-wrap items-center gap-2">
             <label htmlFor="month" className="text-sm text-muted">Month</label>
-            <input type="month" id="month" name="month" defaultValue={month} className="rounded border border-line bg-white px-3 py-2 text-sm" />
+            <input type="month" id="month" name="month" max={thisMonthManila()} defaultValue={month} className="rounded border border-line bg-white px-3 py-2 text-sm" />
             <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Show</button>
             <span className="ml-auto text-sm text-muted tnum">
               {days_present} days · <strong className="text-ink">{formatMinutes(total_minutes)}</strong> total

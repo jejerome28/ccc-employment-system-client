@@ -27,6 +27,12 @@ export function ImportForm() {
         </div>
       )}
 
+      {state?.ok && state.future.length > 0 && (
+        <div role="status" className="mb-5 rounded border border-line bg-white px-4 py-3 text-sm text-muted">
+          {state.future.length} row(s) dated after today were skipped.
+        </div>
+      )}
+
       {state?.ok && state.unknown.length > 0 && (
         <section className="mb-6">
           <h2 className="font-semibold mb-2">Not imported — Person ID not found</h2>

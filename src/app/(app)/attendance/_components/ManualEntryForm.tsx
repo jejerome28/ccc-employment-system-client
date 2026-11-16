@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { todayManila } from "@/app/_lib/format";
 import type { Employee } from "@/app/_lib/types";
 import { FieldError } from "../../_components/FieldError";
 import { Notice } from "../../_components/Notice";
@@ -27,7 +28,7 @@ export function ManualEntryForm({ employees, date }: { employees: Employee[]; da
         </div>
         <div>
           <label htmlFor="work_date" className="block text-sm font-medium mb-1">Date</label>
-          <input id="work_date" name="work_date" type="date" required defaultValue={state?.values?.work_date ?? date} className={input} />
+          <input id="work_date" name="work_date" type="date" required max={todayManila()} defaultValue={state?.values?.work_date ?? date} className={input} />
           <FieldError errors={state?.errors} name="work_date" />
         </div>
         <div>

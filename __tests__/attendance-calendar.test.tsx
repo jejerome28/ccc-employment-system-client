@@ -54,4 +54,14 @@ describe("AttendanceCalendar", () => {
     render(<AttendanceCalendar cal={cal} canEdit={false} />);
     for (const l of cal.legend) expect(screen.getAllByText(l.label).length).toBeGreaterThan(0);
   });
+
+  it("hides Next when next_month is after the current month", () => {
+    jest.useFakeTimers().setSystemTime(new Date("2026-11-12T02:00:00Z"));
+    const { unmount } = render(<AttendanceCalendar cal={{ ...cal, next_month: "2026-12" }} canEdit={false} />);
+    expect(screen.queryByRole("link", { name: /Next/ })).toBeNull();
+    unmount();
+    render(<AttendanceCalendar cal={{ ...cal, next_month: "2026-11" }} canEdit={false} />);
+    expect(screen.getByRole("link", { name: /Next/ })).toBeInTheDocument();
+    jest.useRealTimers();
+  });
 });

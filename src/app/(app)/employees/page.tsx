@@ -8,6 +8,7 @@ import { canEdit, currentUser, isAdmin } from "@/app/_lib/role";
 import type { Employee, Paginated } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
 import { restoreEmployee } from "./_actions/employee.action";
+import { pageLinks } from "./_lib/pagination";
 
 export const metadata: Metadata = { title: "Employees" };
 
@@ -23,6 +24,8 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
   const query = new URLSearchParams({ page, ...(q && { q }), ...(status && { status }), ...(group && { group }), ...(archived && { archived: "1" }) });
   const { date, items, meta } = await apiData<Paginated<Employee> & { date: string }>(`/api/employees?${query}`);
   const pageHref = (n: number) => `/employees?${new URLSearchParams({ page: String(n), ...(q && { q }), ...(status && { status }), ...(group && { group }), ...(archived && { archived: "1" }) })}`;
+
+  const links = pageLinks(meta);
 
   return (
     <>
@@ -118,11 +121,19 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
         </table>
       </div>
 
+      {items.length === 0 && meta.current_page > meta.last_page && (
+        <p className="mt-4 text-sm text-muted">
+          No employees on this page. <Link href={pageHref(1)} className="underline underline-offset-2">Go to page 1</Link>
+        </p>
+      )}
+
       {meta.last_page > 1 && (
         <nav className="mt-4 flex items-center gap-3 text-sm">
-          {meta.current_page > 1 && <Link href={pageHref(meta.current_page - 1)} className="underline underline-offset-2">Previous</Link>}
+          {links.first && <Link href={pageHref(links.first)} className="underline underline-offset-2">First</Link>}
+          {links.prev && <Link href={pageHref(links.prev)} className="underline underline-offset-2">Previous</Link>}
           <span className="text-muted tnum">Page {meta.current_page} of {meta.last_page}</span>
-          {meta.current_page < meta.last_page && <Link href={pageHref(meta.current_page + 1)} className="underline underline-offset-2">Next</Link>}
+          {links.next && <Link href={pageHref(links.next)} className="underline underline-offset-2">Next</Link>}
+          {links.last && <Link href={pageHref(links.last)} className="underline underline-offset-2">Last</Link>}
         </nav>
       )}
     </>
