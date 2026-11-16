@@ -44,9 +44,11 @@ export type Role = "admin" | "hr" | "viewer";
 
 export type User = { id: number; name: string; email: string; role: Role };
 
+export type PageMeta = { current_page: number; last_page: number; per_page: number; total: number };
+
 export type Paginated<T> = {
   items: T[];
-  meta: { current_page: number; last_page: number; per_page: number; total: number };
+  meta: PageMeta;
 };
 
 export type DashboardData = {

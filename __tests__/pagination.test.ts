@@ -1,4 +1,4 @@
-import { pageLinks } from "@/app/(app)/employees/_lib/pagination";
+import { pageLinks } from "@/app/_lib/pagination";
 
 describe("pageLinks", () => {
   it("first page", () => expect(pageLinks({ current_page: 1, last_page: 46 })).toEqual({ next: 2, last: 46 }));
