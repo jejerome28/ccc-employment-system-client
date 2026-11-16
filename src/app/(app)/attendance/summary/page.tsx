@@ -93,6 +93,7 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
             )
           )}
 
+          <div className="mb-8">
           <div className="bg-white border border-line rounded overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-left text-xs text-muted border-b border-line">
@@ -130,6 +131,7 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
           </div>
 
           <Pager meta={r.data.meta} href={(n) => `/attendance/summary${qs({ from, to }, { ...keepQ, page: String(n) })}`} empty={r.data.rows.length === 0} />
+          </div>
 
           {r.data.needs_check.length > 0 && (
             <>
