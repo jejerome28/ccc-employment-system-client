@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { apiFetch } from "@/app/_lib/api.server";
-import { currentCutoff, cutoffRange, formatDate } from "@/app/_lib/format";
+import { currentCutoff, cutoffRange, formatDate, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import type { Summary, SummaryNumbers } from "@/app/_lib/types";
 import { PageHeader } from "../../_components/PageHeader";
@@ -48,15 +48,17 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
       <form className="mb-5 flex flex-wrap items-end gap-2">
         <div>
           <label htmlFor="from" className="block text-xs text-muted mb-1">From</label>
-          <input type="date" id="from" name="from" required defaultValue={from} className={field} />
+          <input type="date" id="from" name="from" required max={todayManila()} defaultValue={from} className={field} />
         </div>
         <div>
           <label htmlFor="to" className="block text-xs text-muted mb-1">To</label>
-          <input type="date" id="to" name="to" required defaultValue={to} className={field} />
+          <input type="date" id="to" name="to" required max={todayManila()} defaultValue={to} className={field} />
         </div>
         <button className={button}>Show</button>
         <Link href={qs(cutoffRange(month, 1))} className="px-3 py-2 text-sm underline underline-offset-2">1–15</Link>
-        <Link href={qs(cutoffRange(month, 2))} className="px-3 py-2 text-sm underline underline-offset-2">16–end</Link>
+        {`${month}-16` <= todayManila() && (
+          <Link href={qs(cutoffRange(month, 2))} className="px-3 py-2 text-sm underline underline-offset-2">16–end</Link>
+        )}
         {r.ok && (
           <span className="ml-auto flex gap-2">
             <a href={`/attendance/summary/export${qs({ from, to })}`} className={button}>Download review (.xlsx)</a>

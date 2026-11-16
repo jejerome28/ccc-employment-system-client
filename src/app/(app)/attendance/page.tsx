@@ -36,17 +36,17 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
       <form action="/attendance/export" method="get" className="mb-5 flex flex-wrap items-end gap-2">
         <div>
           <label htmlFor="from" className="block text-xs text-muted mb-1">From</label>
-          <input type="date" id="from" name="from" required defaultValue={monthStart} className="rounded border border-line bg-white px-3 py-2 text-sm" />
+          <input type="date" id="from" name="from" required max={todayManila()} defaultValue={monthStart} className="rounded border border-line bg-white px-3 py-2 text-sm" />
         </div>
         <div>
           <label htmlFor="to" className="block text-xs text-muted mb-1">To</label>
-          <input type="date" id="to" name="to" required defaultValue={todayManila()} className="rounded border border-line bg-white px-3 py-2 text-sm" />
+          <input type="date" id="to" name="to" required max={todayManila()} defaultValue={todayManila()} className="rounded border border-line bg-white px-3 py-2 text-sm" />
         </div>
         <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Download report</button>
       </form>
 
       <form className="mb-5 flex flex-wrap items-center gap-2">
-        <input type="date" name="date" defaultValue={date} className="rounded border border-line bg-white px-3 py-2 text-sm" />
+        <input type="date" name="date" max={todayManila()} defaultValue={date} className="rounded border border-line bg-white px-3 py-2 text-sm" />
         <input type="search" name="q" defaultValue={q} placeholder="Filter by employee" className="flex-1 min-w-48 rounded border border-line bg-white px-3 py-2 text-sm" />
         <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Show</button>
         <Link href={`/attendance?date=${todayManila()}`} className="px-3 py-2 text-sm text-muted underline underline-offset-2">Today</Link>

@@ -4,6 +4,9 @@ import {
   formatDuration,
   formatMinutes,
   manilaToUtcIso,
+  clampToToday,
+  currentCutoff,
+  cutoffRange,
   thisMonthManila,
   toClockInput,
   todayManila,
@@ -76,5 +79,25 @@ describe("formatDate is timezone-proof", () => {
     expect(formatDate("2026-09-30", "long")).toBe("Wednesday, 30 September 2026");
     expect(formatDate("2026-09-30", "short")).toBe("Wed, 30 Sep");
     expect(formatDate("2026-01-05", "medium")).toBe("05 Jan 2026");
+  });
+});
+
+describe("future dates are clamped to today (Manila)", () => {
+  beforeEach(() => jest.useFakeTimers().setSystemTime(new Date("2026-11-12T02:00:00Z")));
+  afterEach(() => jest.useRealTimers());
+
+  it("cutoffRange clamps to", () => {
+    expect(cutoffRange("2026-11", 2)).toEqual({ from: "2026-11-16", to: "2026-11-12" });
+    expect(cutoffRange("2026-11", 1)).toEqual({ from: "2026-11-01", to: "2026-11-12" });
+    expect(cutoffRange("2026-10", 2)).toEqual({ from: "2026-10-16", to: "2026-10-31" });
+  });
+
+  it("currentCutoff on the 12th ends today", () => {
+    expect(currentCutoff()).toEqual({ from: "2026-11-01", to: "2026-11-12" });
+  });
+
+  it("clampToToday", () => {
+    expect(clampToToday("2026-11-20")).toBe("2026-11-12");
+    expect(clampToToday("2026-11-05")).toBe("2026-11-05");
   });
 });

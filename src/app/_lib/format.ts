@@ -58,10 +58,18 @@ export function thisMonthManila(): string {
   return todayManila().slice(0, 7);
 }
 
+export function clampToToday(date: string): string {
+  const today = todayManila();
+  return date > today ? today : date;
+}
+
+// `from` can end up after `to` (e.g. 16–end early in the month); callers hide or handle that.
 export function cutoffRange(month: string, half: 1 | 2): { from: string; to: string } {
   const [y, m] = month.split("-").map(Number);
   const last = new Date(Date.UTC(y, m, 0)).getUTCDate();
-  return half === 1 ? { from: `${month}-01`, to: `${month}-15` } : { from: `${month}-16`, to: `${month}-${pad(last)}` };
+  return half === 1
+    ? { from: `${month}-01`, to: clampToToday(`${month}-15`) }
+    : { from: `${month}-16`, to: clampToToday(`${month}-${pad(last)}`) };
 }
 
 export function currentCutoff(): { from: string; to: string } {

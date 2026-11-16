@@ -20,7 +20,12 @@ it("forwards only the file and returns counts and unknown IDs", async () => {
     ok: true,
     status: 200,
     message: "Imported 10 rows.",
-    data: { created: 10, updated: 0, unknown: [{ line: 12, person_id: "999", name: "Dela Cruz Juan" }] },
+    data: {
+      created: 10,
+      updated: 0,
+      unknown: [{ line: 12, person_id: "999", name: "Dela Cruz Juan" }],
+      future: [{ line: 15, person_id: "747", work_date: "2026-12-01" }],
+    },
   });
 
   const state = await importAttendance(undefined, upload());
@@ -35,6 +40,7 @@ it("forwards only the file and returns counts and unknown IDs", async () => {
     created: 10,
     updated: 0,
     unknown: [{ line: 12, person_id: "999", name: "Dela Cruz Juan" }],
+    future: [{ line: 15, person_id: "747", work_date: "2026-12-01" }],
   });
   expect(revalidatePath).toHaveBeenCalledWith("/attendance");
   expect(revalidatePath).toHaveBeenCalledWith("/dashboard");

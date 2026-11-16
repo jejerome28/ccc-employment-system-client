@@ -5,13 +5,14 @@ import { apiFetch } from "@/app/_lib/api.server";
 import type { FieldErrors } from "@/app/_lib/types";
 
 export type ImportRow = { line: number; person_id: string; name: string | null };
+export type FutureRow = { line: number; person_id: string; work_date: string };
 export type RowError = { line: number; message: string };
 export type ImportState =
-  | { ok: true; message: string; created: number; updated: number; unknown: ImportRow[] }
+  | { ok: true; message: string; created: number; updated: number; unknown: ImportRow[]; future: FutureRow[] }
   | { ok: false; message: string; rowErrors: RowError[] }
   | undefined;
 
-type ImportResult = { created: number; updated: number; unknown: ImportRow[] };
+type ImportResult = { created: number; updated: number; unknown: ImportRow[]; future: FutureRow[] };
 
 export async function importAttendance(_prev: ImportState, fd: FormData): Promise<ImportState> {
   const body = new FormData();

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatMinutes } from "@/app/_lib/format";
+import { formatMinutes, thisMonthManila } from "@/app/_lib/format";
 import type { CalendarStatus, EmployeeCalendar } from "@/app/_lib/types";
 
 const PURPLE = "bg-purple-100 text-purple-900";
@@ -34,7 +34,7 @@ export function AttendanceCalendar({ cal, canEdit }: { cal: EmployeeCalendar; ca
       <div className="flex items-center justify-between">
         <Link href={`?month=${cal.prev_month}`} className={nav}>‹ Prev</Link>
         <h2 className="font-semibold">{MONTHS[m - 1]} {y}</h2>
-        <Link href={`?month=${cal.next_month}`} className={nav}>Next ›</Link>
+        {cal.next_month <= thisMonthManila() ? <Link href={`?month=${cal.next_month}`} className={nav}>Next ›</Link> : <span />}
       </div>
 
       <div className="grid grid-cols-7 gap-1 text-center text-sm">
