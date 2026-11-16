@@ -71,7 +71,7 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
           </thead>
           <tbody className="divide-y divide-line">
             {attendances.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-sm text-muted">Nobody has clocked in on this date yet.</td></tr>
+              meta.total === 0 && <tr><td colSpan={6} className="px-4 py-10 text-center text-sm text-muted">Nobody has clocked in on this date yet.</td></tr>
             ) : (
               attendances.map((a) => (
                 <tr key={a.id}>

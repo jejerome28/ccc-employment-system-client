@@ -105,7 +105,7 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
               </thead>
               <tbody className="divide-y divide-line">
                 {r.data.rows.length === 0 ? (
-                  <tr><td colSpan={COLUMNS.length + 2} className="px-4 py-10 text-center text-sm text-muted">No active employees.</td></tr>
+                  r.data.meta.total === 0 && <tr><td colSpan={COLUMNS.length + 2} className="px-4 py-10 text-center text-sm text-muted">{q ? "No employees match this search." : "No active employees."}</td></tr>
                 ) : (
                   r.data.rows.map((row) => (
                     <tr key={row.employee_id}>
@@ -119,7 +119,7 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
                   ))
                 )}
               </tbody>
-              {r.data.rows.length > 0 && (
+              {r.data.meta.total > 0 && (
                 <tfoot className="border-t border-line font-semibold">
                   <tr>
                     <td className="px-4 py-3" colSpan={2}>Total</td>
