@@ -5,6 +5,7 @@ import { currentCutoff, cutoffRange, formatDate, todayManila } from "@/app/_lib/
 import { param } from "@/app/_lib/params";
 import type { Summary, SummaryNumbers } from "@/app/_lib/types";
 import { PageHeader } from "../../_components/PageHeader";
+import { Pager } from "../../_components/Pager";
 
 export const metadata: Metadata = { title: "Cutoff summary" };
 
@@ -28,11 +29,14 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
   const fallback = currentCutoff();
   const from = param(sp.from) || fallback.from;
   const to = param(sp.to) || fallback.to;
+  const q = param(sp.q);
+  const page = param(sp.page);
   const exportError = param(sp.export_error);
   const month = from.slice(0, 7);
-  const qs = (r: { from: string; to: string }) => `?${new URLSearchParams(r)}`;
+  const qs = (r: { from: string; to: string }, extra: Record<string, string> = {}) => `?${new URLSearchParams({ ...r, ...extra })}`;
+  const keepQ: Record<string, string> = q ? { q } : {};
 
-  const r = await apiFetch<Summary>(`/api/attendance/summary${qs({ from, to })}`);
+  const r = await apiFetch<Summary>(`/api/attendance/summary${qs({ from, to }, { ...keepQ, ...(page ? { page } : {}) })}`);
   const error = exportError || (!r.ok ? (Object.values(r.errors ?? {})[0]?.[0] ?? r.message) : null);
 
   return (
@@ -54,10 +58,14 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
           <label htmlFor="to" className="block text-xs text-muted mb-1">To</label>
           <input type="date" id="to" name="to" required max={todayManila()} defaultValue={to} className={field} />
         </div>
+        <div>
+          <label htmlFor="q" className="block text-xs text-muted mb-1">Employee</label>
+          <input type="search" id="q" name="q" defaultValue={q} placeholder="Search employee" className={field} />
+        </div>
         <button className={button}>Show</button>
-        <Link href={qs(cutoffRange(month, 1))} className="px-3 py-2 text-sm underline underline-offset-2">1–15</Link>
+        <Link href={qs(cutoffRange(month, 1), keepQ)} className="px-3 py-2 text-sm underline underline-offset-2">1–15</Link>
         {`${month}-16` <= todayManila() && (
-          <Link href={qs(cutoffRange(month, 2))} className="px-3 py-2 text-sm underline underline-offset-2">16–end</Link>
+          <Link href={qs(cutoffRange(month, 2), keepQ)} className="px-3 py-2 text-sm underline underline-offset-2">16–end</Link>
         )}
         {r.ok && (
           <span className="ml-auto flex gap-2">
@@ -85,7 +93,7 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
             )
           )}
 
-          <div className="bg-white border border-line rounded overflow-x-auto mb-8">
+          <div className="bg-white border border-line rounded overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-left text-xs text-muted border-b border-line">
                 <tr>
@@ -120,6 +128,8 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
               )}
             </table>
           </div>
+
+          <Pager meta={r.data.meta} href={(n) => `/attendance/summary${qs({ from, to }, { ...keepQ, page: String(n) })}`} empty={r.data.rows.length === 0} />
 
           {r.data.needs_check.length > 0 && (
             <>

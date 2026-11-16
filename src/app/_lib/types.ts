@@ -56,6 +56,7 @@ export type DashboardData = {
   stats: { employees: number; active: number; clocked_in: number; completed: number; not_in: number };
   hours_today: number;
   employees: Employee[];
+  meta: PageMeta;
 };
 
 export type EmployeeDetail = {
@@ -70,6 +71,7 @@ export type AttendanceDay = {
   attendances: Attendance[];
   total_minutes: number;
   employees: Employee[];
+  meta: PageMeta;
 };
 
 export type SummaryNumbers = {
@@ -102,6 +104,7 @@ export type Summary = {
   rows: SummaryRow[];
   totals: SummaryNumbers;
   needs_check: { employee_id: number; name: string; work_date: string; punch: string }[];
+  meta: PageMeta;
 };
 
 export type FieldErrors = Record<string, string[]>;

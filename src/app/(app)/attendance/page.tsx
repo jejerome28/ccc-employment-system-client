@@ -6,6 +6,7 @@ import { param } from "@/app/_lib/params";
 import { canEdit, currentUser } from "@/app/_lib/role";
 import type { AttendanceDay } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
+import { Pager } from "../_components/Pager";
 import { ManualEntryForm } from "./_components/ManualEntryForm";
 import { remarkLabel } from "./_components/RemarkFields";
 
@@ -15,13 +16,15 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
   const sp = await props.searchParams;
   const picked = param(sp.date);
   const q = param(sp.q);
+  const page = param(sp.page);
   const exportError = param(sp.export_error);
   const { role } = await currentUser();
   const monthStart = `${todayManila().slice(0, 8)}01`;
 
-  const { date, attendances, total_minutes, employees } = await apiData<AttendanceDay>(
-    `/api/attendance?${new URLSearchParams({ ...(picked && { date: picked }), ...(q && { q }) })}`,
+  const { date, attendances, total_minutes, employees, meta } = await apiData<AttendanceDay>(
+    `/api/attendance?${new URLSearchParams({ ...(picked && { date: picked }), ...(q && { q }), ...(page && { page }) })}`,
   );
+  const pageHref = (n: number) => `/attendance?${new URLSearchParams({ date, ...(q && { q }), page: String(n) })}`;
 
   return (
     <>
@@ -53,7 +56,7 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
         <Link href="/attendance" className="px-3 py-2 text-sm text-muted underline underline-offset-2">Latest</Link>
       </form>
 
-      <div className="bg-white border border-line rounded overflow-x-auto mb-8">
+      <div className="bg-white border border-line rounded overflow-x-auto mb-0">
         <table className="w-full text-sm">
           <thead className="text-left text-xs text-muted border-b border-line">
             <tr>
@@ -92,13 +95,15 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
           {attendances.length > 0 && (
             <tfoot className="border-t border-line">
               <tr>
-                <td className="px-4 py-3 text-xs text-muted" colSpan={3}>{attendances.length} records</td>
+                <td className="px-4 py-3 text-xs text-muted" colSpan={3}>{meta.total} records</td>
                 <td className="px-4 py-3 tnum font-semibold" colSpan={3}>{formatMinutes(total_minutes)} total</td>
               </tr>
             </tfoot>
           )}
         </table>
       </div>
+
+      <Pager meta={meta} href={pageHref} empty={attendances.length === 0} />
 
       {canEdit(role) && (
         <>

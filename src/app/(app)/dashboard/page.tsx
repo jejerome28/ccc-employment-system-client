@@ -1,18 +1,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { param } from "@/app/_lib/params";
 import { apiData } from "@/app/_lib/api.server";
 import { formatClock, formatDate, formatDuration, todayManila } from "@/app/_lib/format";
 import { canEdit, currentUser } from "@/app/_lib/role";
 import type { DashboardData } from "@/app/_lib/types";
 import { PageHeader } from "../_components/PageHeader";
+import { Pager } from "../_components/Pager";
 import { ClockButton } from "./_components/ClockButton";
 
 const CLOCK_BUTTONS = false;
 
 export const metadata: Metadata = { title: "Today" };
 
-export default async function DashboardPage() {
-  const { date, stats, hours_today, employees } = await apiData<DashboardData>("/api/dashboard");
+export default async function DashboardPage(props: PageProps<"/dashboard">) {
+  const sp = await props.searchParams;
+  const q = param(sp.q);
+  const page = param(sp.page);
+  const { date, stats, hours_today, employees, meta } = await apiData<DashboardData>(
+    `/api/dashboard?${new URLSearchParams({ ...(q && { q }), ...(page && { page }) })}`,
+  );
+  const pageHref = (n: number) => `/dashboard?${new URLSearchParams({ ...(q && { q }), page: String(n) })}`;
   const { role } = await currentUser();
   const isToday = date === todayManila();
 
@@ -43,6 +51,12 @@ export default async function DashboardPage() {
           </div>
         ))}
       </div>
+
+      <form className="mb-5 flex flex-wrap gap-2">
+        <input type="search" name="q" defaultValue={q} placeholder="Search employee" className="flex-1 min-w-52 rounded border border-line bg-white px-3 py-2 text-sm" />
+        <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Search</button>
+        {q && <Link href="/dashboard" className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
+      </form>
 
       <div className="bg-white border border-line rounded overflow-hidden">
         <div className="px-4 py-3 border-b border-line flex items-center justify-between">
@@ -96,6 +110,8 @@ export default async function DashboardPage() {
           </table>
         )}
       </div>
+
+      <Pager meta={meta} href={pageHref} empty={employees.length === 0} />
     </>
   );
 }
