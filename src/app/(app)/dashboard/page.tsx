@@ -65,7 +65,7 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
         </div>
 
         {employees.length === 0 ? (
-          <div className="px-4 py-10 text-center">
+          meta.total === 0 && <div className="px-4 py-10 text-center">
             <p className="text-sm text-muted mb-3">{q ? "No employees match this search." : "No active employees yet."}</p>
             {!q && canEdit(role) && <Link href="/employees/new" className="text-sm font-semibold underline underline-offset-2">Add your first employee</Link>}
           </div>
