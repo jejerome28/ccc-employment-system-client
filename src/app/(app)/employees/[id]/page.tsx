@@ -7,6 +7,7 @@ import { canEdit, currentUser } from "@/app/_lib/role";
 import type { EmployeeCalendar, EmployeeDetail } from "@/app/_lib/types";
 import { AttendanceCalendar } from "./_components/AttendanceCalendar";
 import { PageHeader } from "../../_components/PageHeader";
+import { InOutWorked } from "../../_components/InOutWorked";
 
 export default async function EmployeePage(props: PageProps<"/employees/[id]">) {
   const { id } = await props.params;
@@ -27,20 +28,31 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
     ["Status", e.status === "active" ? "Active" : "Inactive"],
   ];
 
+  const editable = canEdit(role);
+  const rows = attendances.map((a) => ({
+    a,
+    day: formatDate(a.work_date, "short"),
+    timeIn: formatClock(a.clock_in_at),
+    timeOut: formatClock(a.clock_out_at),
+    worked: formatDuration(a),
+  }));
+  const empty = "No time records for this month.";
+  const edit = (id: number) => <Link href={`/attendance/${id}/edit`} className="inline-block -m-3 p-3 text-xs font-semibold underline underline-offset-2">Edit</Link>;
+
   return (
     <>
       <PageHeader
         title={e.full_name}
         subtitle={`${e.employee_code} · ${e.position || "No position set"}`}
         actions={
-          canEdit(role) && (
+          editable && (
             <Link href={`/employees/${e.id}/edit`} className="inline-block rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">
               Edit details
             </Link>
           )
         }
       />
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6 items-start">
         <div className="bg-white border border-line rounded p-5 text-sm space-y-3">
           {details.map(([label, value]) => (
             <div key={label} className="flex justify-between gap-4 border-b border-line pb-2 last:border-0 last:pb-0">
@@ -51,7 +63,7 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
         </div>
 
         <div className="lg:col-span-2 space-y-4">
-          <AttendanceCalendar cal={cal} canEdit={canEdit(role)} />
+          <AttendanceCalendar cal={cal} canEdit={editable} />
           <form className="flex flex-wrap items-center gap-2">
             <label htmlFor="month" className="text-sm text-muted">Month</label>
             <input type="month" id="month" name="month" max={thisMonthManila()} defaultValue={month} className="rounded border border-line bg-white px-3 py-2 text-sm" />
@@ -61,7 +73,7 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
             </span>
           </form>
 
-          <div className="bg-white border border-line rounded overflow-x-auto">
+          <div className="hidden md:block bg-white border border-line rounded overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-left text-xs text-muted border-b border-line">
                 <tr>
@@ -70,29 +82,44 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
                   <th className="px-4 py-2 font-medium">Time out</th>
                   <th className="px-4 py-2 font-medium">Worked</th>
                   <th className="px-4 py-2 font-medium">Notes</th>
-                  <th className="px-4 py-2" />
+                  {editable && <th className="px-4 py-2" />}
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {attendances.length === 0 ? (
-                  <tr><td colSpan={6} className="px-4 py-10 text-center text-sm text-muted">No time records for this month.</td></tr>
+                {rows.length === 0 ? (
+                  <tr><td colSpan={editable ? 6 : 5} className="px-4 py-10 text-center text-sm text-muted">{empty}</td></tr>
                 ) : (
-                  attendances.map((a) => (
+                  rows.map(({ a, day, timeIn, timeOut, worked }) => (
                     <tr key={a.id}>
-                      <td className="px-4 py-3 tnum">{formatDate(a.work_date, "short")}</td>
-                      <td className="px-4 py-3 tnum">{formatClock(a.clock_in_at)}</td>
-                      <td className="px-4 py-3 tnum">{formatClock(a.clock_out_at)}</td>
-                      <td className="px-4 py-3 tnum">{formatDuration(a)}</td>
+                      <td className="px-4 py-3 tnum">{day}</td>
+                      <td className="px-4 py-3 tnum">{timeIn}</td>
+                      <td className="px-4 py-3 tnum">{timeOut}</td>
+                      <td className="px-4 py-3 tnum">{worked}</td>
                       <td className="px-4 py-3 text-muted text-xs">{a.notes || "—"}</td>
-                      <td className="px-4 py-3 text-right">
-                        {canEdit(role) && <Link href={`/attendance/${a.id}/edit`} className="text-xs font-semibold underline underline-offset-2">Edit</Link>}
-                      </td>
+                      {editable && <td className="px-4 py-3 text-right">{edit(a.id)}</td>}
                     </tr>
                   ))
                 )}
               </tbody>
             </table>
           </div>
+
+          <ul className="md:hidden bg-white border border-line rounded divide-y divide-line">
+            {rows.length === 0 ? (
+              <li className="px-4 py-10 text-center text-sm text-muted">{empty}</li>
+            ) : (
+              rows.map(({ a, day, timeIn, timeOut, worked }) => (
+                <li key={a.id} className="px-4 py-3 space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-medium tnum">{day}</span>
+                    {editable && edit(a.id)}
+                  </div>
+                  <InOutWorked timeIn={timeIn} timeOut={timeOut} worked={worked} />
+                  {a.notes && <p className="text-xs text-muted">{a.notes}</p>}
+                </li>
+              ))
+            )}
+          </ul>
         </div>
       </div>
     </>

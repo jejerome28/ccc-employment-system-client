@@ -14,7 +14,14 @@ export function ImportForm() {
       <form action={action} className="bg-white border border-line rounded p-5 flex flex-wrap items-end gap-4 mb-6">
         <div className="flex-1 min-w-64">
           <label htmlFor="file" className="block text-sm font-medium mb-1">Attendance report (.csv or Excel .xlsx)</label>
-          <input id="file" name="file" type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required className="block w-full text-sm" />
+          <input
+            id="file" name="file" type="file" required aria-describedby="file-hint"
+            accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            className="block w-full text-sm text-muted file:mr-3 file:rounded file:border file:border-ink file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-ink hover:file:text-canvas"
+          />
+          <p id="file-hint" className="mt-2 text-xs text-muted">
+            Upload the device&apos;s Attendance report export as it is. Rows are matched to employees by Person ID.
+          </p>
         </div>
         <button disabled={pending} className="rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90 disabled:opacity-60">
           {pending ? "Importing…" : "Import"}
@@ -37,16 +44,18 @@ export function ImportForm() {
         <section className="mb-6">
           <h2 className="font-semibold mb-2">Not imported — Person ID not found</h2>
           <p className="text-sm text-muted mb-3">Add the Person ID to the employee record, then import the file again.</p>
-          <table className="w-full text-sm bg-white border border-line rounded">
-            <thead className="text-left text-xs text-muted border-b border-line">
-              <tr><th className={th}>Line</th><th className={th}>Person ID</th><th className={th}>Name</th></tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {state.unknown.map((u) => (
-                <tr key={u.line}><td className={`${td} tnum`}>{u.line}</td><td className={`${td} tnum`}>{u.person_id}</td><td className={td}>{u.name ?? "—"}</td></tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm bg-white border border-line rounded">
+              <thead className="text-left text-xs text-muted border-b border-line">
+                <tr><th className={th}>Line</th><th className={th}>Person ID</th><th className={th}>Name</th></tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {state.unknown.map((u) => (
+                  <tr key={u.line}><td className={`${td} tnum`}>{u.line}</td><td className={`${td} tnum`}>{u.person_id}</td><td className={td}>{u.name ?? "—"}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
@@ -59,16 +68,18 @@ export function ImportForm() {
       {state && !state.ok && state.rowErrors.length > 0 && (
         <section>
           <h2 className="font-semibold mb-2">Nothing was imported</h2>
-          <table className="w-full text-sm bg-white border border-line rounded">
-            <thead className="text-left text-xs text-muted border-b border-line">
-              <tr><th className={th}>Line</th><th className={th}>Problem</th></tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {state.rowErrors.map((e, i) => (
-                <tr key={i}><td className={`${td} tnum`}>{e.line}</td><td className={td}>{e.message}</td></tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm bg-white border border-line rounded">
+              <thead className="text-left text-xs text-muted border-b border-line">
+                <tr><th className={th}>Line</th><th className={th}>Problem</th></tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {state.rowErrors.map((e, i) => (
+                  <tr key={i}><td className={`${td} tnum`}>{e.line}</td><td className={td}>{e.message}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
     </>

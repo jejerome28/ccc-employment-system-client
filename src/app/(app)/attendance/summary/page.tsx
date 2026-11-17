@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { apiFetch } from "@/app/_lib/api.server";
-import { currentCutoff, cutoffRange, formatDate, todayManila } from "@/app/_lib/format";
+import { currentCutoff, cutoffFor, cutoffRange, formatDate, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
-import type { Summary, SummaryNumbers } from "@/app/_lib/types";
+import { canEdit, currentUser } from "@/app/_lib/role";
+import type { Summary, SummaryNumbers, SummaryRow } from "@/app/_lib/types";
 import { PageHeader } from "../../_components/PageHeader";
 import { Pager } from "../../_components/Pager";
 
@@ -26,6 +28,7 @@ const button = "rounded border border-ink px-4 py-2 text-sm font-semibold hover:
 
 export default async function SummaryPage(props: PageProps<"/attendance/summary">) {
   const sp = await props.searchParams;
+  const rangeGiven = Boolean(param(sp.from) || param(sp.to));
   const fallback = currentCutoff();
   const from = param(sp.from) || fallback.from;
   const to = param(sp.to) || fallback.to;
@@ -36,8 +39,30 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
   const qs = (r: { from: string; to: string }, extra: Record<string, string> = {}) => `?${new URLSearchParams({ ...r, ...extra })}`;
   const keepQ: Record<string, string> = q ? { q } : {};
 
-  const r = await apiFetch<Summary>(`/api/attendance/summary${qs({ from, to }, { ...keepQ, ...(page ? { page } : {}) })}`);
+  const [r, { role }] = await Promise.all([
+    apiFetch<Summary>(`/api/attendance/summary${qs({ from, to }, { ...keepQ, ...(page ? { page } : {}) })}`),
+    currentUser(),
+  ]);
+
+  if (!rangeGiven && !exportError && r.ok && r.data.computed_through !== null && r.data.computed_through < from) {
+    redirect(`/attendance/summary${qs(cutoffFor(r.data.computed_through), keepQ)}`);
+  }
+
   const error = exportError || (!r.ok ? (Object.values(r.errors ?? {})[0]?.[0] ?? r.message) : null);
+  const sub = (row: SummaryRow) => [row.employee_code, row.department].filter(Boolean).join(" · ");
+  const nameLink = (row: SummaryRow) => <Link href={`/employees/${row.employee_id}`} className="font-medium hover:underline underline-offset-2">{row.name}</Link>;
+  const numbers = (values: SummaryNumbers) => (
+    <dl className="mt-3 grid grid-cols-3 gap-x-3 gap-y-2">
+      {COLUMNS.map((c) => (
+        <div key={c.key}>
+          <dt className="text-[11px] leading-tight text-muted">{c.label}</dt>
+          <dd className="tnum font-medium">{values[c.key]}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+
+  const emptyText = r.ok && r.data.rows.length === 0 && r.data.meta.total === 0 ? (q ? "No employees match this search." : "No active employees.") : null;
 
   return (
     <>
@@ -68,7 +93,7 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
           <Link href={qs(cutoffRange(month, 2), keepQ)} className="px-3 py-2 text-sm underline underline-offset-2">16–end</Link>
         )}
         {r.ok && (
-          <span className="ml-auto flex gap-2">
+          <span className="flex flex-wrap gap-2 sm:ml-auto">
             <a href={`/attendance/summary/export${qs({ from, to })}`} className={button}>Download review (.xlsx)</a>
             <a href={`/attendance/summary/cra${qs({ from, to })}`} className={button}>Download CRA (.xlsx)</a>
           </span>
@@ -94,50 +119,71 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
           )}
 
           <div className="mb-8">
-          <div className="bg-white border border-line rounded overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs text-muted border-b border-line">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Person ID</th>
-                  <th className="px-4 py-2 font-medium">Employee</th>
-                  {COLUMNS.map((c) => <th key={c.key} className="px-3 py-2 font-medium text-right">{c.label}</th>)}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {r.data.rows.length === 0 ? (
-                  r.data.meta.total === 0 && <tr><td colSpan={COLUMNS.length + 2} className="px-4 py-10 text-center text-sm text-muted">{q ? "No employees match this search." : "No active employees."}</td></tr>
-                ) : (
-                  r.data.rows.map((row) => (
+            <div className="hidden md:block bg-white border border-line rounded overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs text-muted border-b border-line">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Person ID</th>
+                    <th className="px-4 py-2 font-medium">Employee</th>
+                    {COLUMNS.map((c) => <th key={c.key} className="px-3 py-2 font-medium text-right">{c.label}</th>)}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {emptyText && <tr><td colSpan={COLUMNS.length + 2} className="px-4 py-10 text-center text-sm text-muted">{emptyText}</td></tr>}
+                  {r.data.rows.map((row) => (
                     <tr key={row.employee_id}>
                       <td className="px-4 py-3 tnum text-muted">{row.person_id ?? "—"}</td>
                       <td className="px-4 py-3">
-                        <Link href={`/employees/${row.employee_id}`} className="font-medium hover:underline underline-offset-2">{row.name}</Link>
-                        <p className="text-xs text-muted">{row.department ?? ""}</p>
+                        {nameLink(row)}
+                        <p className="text-xs text-muted">{sub(row)}</p>
                       </td>
                       {COLUMNS.map((c) => <td key={c.key} className="px-3 py-3 tnum text-right">{row[c.key]}</td>)}
                     </tr>
-                  ))
+                  ))}
+                </tbody>
+                {r.data.meta.total > 0 && (
+                  <tfoot className="border-t border-line font-semibold">
+                    <tr>
+                      <td className="px-4 py-3" colSpan={2}>Total</td>
+                      {COLUMNS.map((c) => <td key={c.key} className="px-3 py-3 tnum text-right">{r.data.totals[c.key]}</td>)}
+                    </tr>
+                  </tfoot>
                 )}
-              </tbody>
-              {r.data.meta.total > 0 && (
-                <tfoot className="border-t border-line font-semibold">
-                  <tr>
-                    <td className="px-4 py-3" colSpan={2}>Total</td>
-                    {COLUMNS.map((c) => <td key={c.key} className="px-3 py-3 tnum text-right">{r.data.totals[c.key]}</td>)}
-                  </tr>
-                </tfoot>
-              )}
-            </table>
-          </div>
+              </table>
+            </div>
 
-          <Pager meta={r.data.meta} href={(n) => `/attendance/summary${qs({ from, to }, { ...keepQ, page: String(n) })}`} empty={r.data.rows.length === 0} />
+            <ul className="md:hidden space-y-3">
+              {emptyText && <li className="bg-white border border-line rounded px-4 py-10 text-center text-sm text-muted">{emptyText}</li>}
+              {r.data.rows.map((row) => (
+                <li key={row.employee_id} className="bg-white border border-line rounded px-4 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      {nameLink(row)}
+                      <p className="text-xs text-muted">{sub(row)}</p>
+                    </div>
+                    <span className="text-xs text-muted tnum whitespace-nowrap">Person ID {row.person_id ?? "—"}</span>
+                  </div>
+                  {numbers(row)}
+                </li>
+              ))}
+              {r.data.meta.total > 0 && (
+                <li className="bg-white border border-ink rounded px-4 py-3">
+                  <p className="font-semibold">Total</p>
+                  {numbers(r.data.totals)}
+                </li>
+              )}
+            </ul>
+
+            <Pager meta={r.data.meta} href={(n) => `/attendance/summary${qs({ from, to }, { ...keepQ, page: String(n) })}`} empty={r.data.rows.length === 0} />
           </div>
 
           {r.data.needs_check.length > 0 && (
             <>
               <h2 className="font-semibold mb-2">Needs check</h2>
               <p className="text-sm text-muted mb-3">
-                Only one punch was recorded. Confirm against the guard logbook, then fix the record. These days aren&apos;t counted until then.
+                {canEdit(role)
+                  ? "Only one punch was recorded. Confirm against the guard logbook, then fix the record. These days aren't counted until then."
+                  : "Only one punch was recorded. These days aren't counted until HR fixes the record."}
               </p>
               <ul className="bg-white border border-line rounded divide-y divide-line text-sm">
                 {r.data.needs_check.map((n) => (

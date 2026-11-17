@@ -1,28 +1,27 @@
 import type { ReactNode } from "react";
 import { formatDate, todayManila } from "@/app/_lib/format";
 import { currentUser } from "@/app/_lib/role";
+import { MobileNav } from "./_components/MobileNav";
 import { NavLinks } from "./_components/NavLinks";
-import { logout } from "./_actions/logout.action";
+import { UserBlock } from "./_components/UserBlock";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const user = await currentUser();
+  const today = formatDate(todayManila(), "medium");
 
   return (
     <div className="min-h-full lg:flex">
-      <aside className="lg:w-60 lg:flex-none bg-ink text-canvas lg:min-h-screen lg:flex lg:flex-col">
+      <MobileNav role={user.role} name={user.name} email={user.email} today={today} />
+      <aside className="hidden lg:flex lg:w-60 lg:flex-none lg:flex-col lg:sticky lg:top-0 lg:self-start lg:h-screen bg-ink text-canvas">
         <div className="px-5 py-5">
           <p className="text-base font-bold leading-tight">Staff Time Records</p>
-          <p className="text-xs text-canvas/60 tnum">{formatDate(todayManila(), "medium")}</p>
+          <p className="text-xs text-canvas/60 tnum">{today}</p>
         </div>
-        <NavLinks role={user.role} />
-        <div className="px-5 py-4 border-t border-white/10 lg:mt-auto">
-          <p className="text-sm font-medium">{user.name}</p>
-          <p className="text-xs text-canvas/55 mb-2">{user.email}</p>
-          <form action={logout}>
-            <button type="submit" className="text-xs text-canvas/75 underline underline-offset-2 hover:text-white">
-              Sign out
-            </button>
-          </form>
+        <div className="flex-1 overflow-y-auto">
+          <NavLinks role={user.role} />
+        </div>
+        <div className="px-5 py-4 border-t border-white/10 mt-auto">
+          <UserBlock name={user.name} email={user.email} />
         </div>
       </aside>
       <main className="flex-1 min-w-0">

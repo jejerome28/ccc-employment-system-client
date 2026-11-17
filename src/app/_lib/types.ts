@@ -88,6 +88,7 @@ export type SummaryNumbers = {
 
 export type SummaryRow = SummaryNumbers & {
   employee_id: number;
+  employee_code: string;
   person_id: string | null;
   name: string;
   department: string | null;
