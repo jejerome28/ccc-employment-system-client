@@ -72,7 +72,10 @@ export function cutoffRange(month: string, half: 1 | 2): { from: string; to: str
     : { from: `${month}-16`, to: clampToToday(`${month}-${pad(last)}`) };
 }
 
+export function cutoffFor(ymd: string): { from: string; to: string } {
+  return cutoffRange(ymd.slice(0, 7), Number(ymd.slice(8)) <= 15 ? 1 : 2);
+}
+
 export function currentCutoff(): { from: string; to: string } {
-  const today = todayManila();
-  return cutoffRange(today.slice(0, 7), Number(today.slice(8)) <= 15 ? 1 : 2);
+  return cutoffFor(todayManila());
 }

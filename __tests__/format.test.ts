@@ -6,6 +6,7 @@ import {
   manilaToUtcIso,
   clampToToday,
   currentCutoff,
+  cutoffFor,
   cutoffRange,
   thisMonthManila,
   toClockInput,
@@ -90,6 +91,12 @@ describe("future dates are clamped to today (Manila)", () => {
     expect(cutoffRange("2026-11", 2)).toEqual({ from: "2026-11-16", to: "2026-11-12" });
     expect(cutoffRange("2026-11", 1)).toEqual({ from: "2026-11-01", to: "2026-11-12" });
     expect(cutoffRange("2026-10", 2)).toEqual({ from: "2026-10-16", to: "2026-10-31" });
+  });
+
+  it("cutoffFor picks the half-month cutoff holding a date", () => {
+    expect(cutoffFor("2026-10-20")).toEqual({ from: "2026-10-16", to: "2026-10-31" });
+    expect(cutoffFor("2026-10-15")).toEqual({ from: "2026-10-01", to: "2026-10-15" });
+    expect(cutoffFor("2026-11-03")).toEqual({ from: "2026-11-01", to: "2026-11-12" });
   });
 
   it("currentCutoff on the 12th ends today", () => {

@@ -30,7 +30,7 @@ it("saveAttendance converts Manila times to UTC ISO, blanks to null", async () =
 
   expect(apiFetch).toHaveBeenCalledWith("/api/attendance", {
     method: "POST",
-    body: { employee_id: 3, work_date: "2026-09-29", clock_in_at: "2026-09-29T00:00:00Z", clock_out_at: null, notes: null },
+    body: { employee_id: 3, work_date: "2026-09-29", clock_in_at: "2026-09-29T00:00:00Z", clock_out_at: null, notes: null, remark: null, remark_part: null },
   });
   expect(state).toEqual({ message: "Attendance saved." });
 });
@@ -44,7 +44,7 @@ it("updateAttendance moves an overnight time out to the next day and redirects",
 
   expect(apiFetch).toHaveBeenCalledWith("/api/attendance/9", {
     method: "PUT",
-    body: { clock_in_at: "2026-06-30T14:00:00Z", clock_out_at: "2026-06-30T22:00:00Z", notes: "night" },
+    body: { clock_in_at: "2026-06-30T14:00:00Z", clock_out_at: "2026-06-30T22:00:00Z", notes: "night", remark: null, remark_part: null },
   });
   expect(redirect).toHaveBeenCalledWith("/attendance?date=2026-06-30");
 });
@@ -64,8 +64,19 @@ it("updateAttendance keeps the original ISO (with seconds) for an unchanged time
 
   expect(apiFetch).toHaveBeenCalledWith("/api/attendance/9", {
     method: "PUT",
-    body: { clock_in_at: "2026-06-21T23:04:14Z", clock_out_at: "2026-06-22T10:00:00Z", notes: "x" },
+    body: { clock_in_at: "2026-06-21T23:04:14Z", clock_out_at: "2026-06-22T10:00:00Z", notes: "x", remark: null, remark_part: null },
   });
+});
+
+it("sends the remark and its half; drops the half when there is no remark", async () => {
+  (apiFetch as jest.Mock).mockResolvedValue({ ok: true, status: 200, message: "Attendance saved.", data: {} });
+
+  await saveAttendance(undefined, form({ employee_id: "3", work_date: "2026-09-29", remark: "leave", remark_part: "am" }));
+  await saveAttendance(undefined, form({ employee_id: "3", work_date: "2026-09-29", remark: "", remark_part: "pm" }));
+
+  const bodies = (apiFetch as jest.Mock).mock.calls.map((c) => c[1].body);
+  expect(bodies[0]).toMatchObject({ remark: "leave", remark_part: "am" });
+  expect(bodies[1]).toMatchObject({ remark: null, remark_part: null });
 });
 
 it("sends malformed times as typed so the API error lands on the field", async () => {

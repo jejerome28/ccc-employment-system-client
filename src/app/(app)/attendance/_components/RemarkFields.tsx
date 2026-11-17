@@ -27,9 +27,3 @@ export function RemarkFields({ state, attendance }: { state: ActionState; attend
     </>
   );
 }
-
-export function remarkLabel(a: Pick<Attendance, "remark" | "remark_part">): string | null {
-  if (!a.remark) return null;
-  const name = a.remark === "ob" ? "OB" : "Leave";
-  return a.remark_part === "am" ? `${name} (AM)` : a.remark_part === "pm" ? `${name} (PM)` : name;
-}

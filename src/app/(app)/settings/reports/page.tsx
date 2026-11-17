@@ -15,8 +15,8 @@ export default async function ReportSettingsPage() {
   return (
     <>
       <PageHeader title="Report settings" subtitle="One line per title line. Used at the bottom of every CRA block." />
-      <div className="space-y-3 max-w-3xl">
-        {signatories.map((s) => <SignatoryForm key={s.id} signatory={s} />)}
+      <div className="max-w-3xl">
+        <SignatoryForm signatories={signatories} />
       </div>
     </>
   );

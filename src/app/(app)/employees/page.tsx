@@ -18,12 +18,32 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
   const status = param(sp.status);
   const group = param(sp.group);
   const page = param(sp.page) || "1";
-  const archived = param(sp.archived) === "1";
   const { role } = await currentUser();
+  const archived = param(sp.archived) === "1" && isAdmin(role);
+  const showActions = archived || canEdit(role);
 
-  const query = new URLSearchParams({ page, ...(q && { q }), ...(status && { status }), ...(group && { group }), ...(archived && { archived: "1" }) });
-  const { date, items, meta } = await apiData<Paginated<Employee> & { date: string }>(`/api/employees?${query}`);
-  const pageHref = (n: number) => `/employees?${new URLSearchParams({ page: String(n), ...(q && { q }), ...(status && { status }), ...(group && { group }), ...(archived && { archived: "1" }) })}`;
+  const filters = { ...(q && { q }), ...(status && { status }), ...(group && { group }), ...(archived && { archived: "1" }) };
+  const { date, items, meta } = await apiData<Paginated<Employee> & { date: string }>(`/api/employees?${new URLSearchParams({ page, ...filters })}`);
+  const pageHref = (n: number) => `/employees?${new URLSearchParams({ page: String(n), ...filters })}`;
+  const dayLabel = date === todayManila() ? "Today" : formatDate(date, "short");
+  const empty = "No employees match this search.";
+
+  const name = (e: Employee) => archived
+    ? <span className="font-medium text-muted">{e.full_name}</span>
+    : <Link href={`/employees/${e.id}`} className="font-medium hover:underline underline-offset-2">{e.full_name}</Link>;
+  const pill = (e: Employee) => (
+    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${e.status === "active" ? "bg-moss/10 text-moss" : "bg-ink/10 text-muted"}`}>
+      {e.status === "active" ? "Active" : "Inactive"}
+    </span>
+  );
+  const dayTimes = (e: Employee) => `${formatClock(e.today_attendance?.clock_in_at)} – ${formatClock(e.today_attendance?.clock_out_at)}`;
+  const action = (e: Employee) => archived ? (
+    <form action={restoreEmployee.bind(null, e.id)}>
+      <button className="inline-block -m-3 p-3 text-xs font-semibold underline underline-offset-2">Restore</button>
+    </form>
+  ) : (
+    <Link href={`/employees/${e.id}/edit`} className="inline-block -m-3 p-3 text-xs font-semibold underline underline-offset-2">Edit</Link>
+  );
 
   return (
     <>
@@ -32,9 +52,11 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
         subtitle={`${meta.total} records`}
         actions={
           <div className="flex items-center gap-3">
-            <Link href={archived ? "/employees" : "/employees?archived=1"} className="text-sm text-muted underline underline-offset-2">
-              {archived ? "Show active" : "Show archived"}
-            </Link>
+            {isAdmin(role) && (
+              <Link href={archived ? "/employees" : "/employees?archived=1"} className="text-sm text-muted underline underline-offset-2">
+                {archived ? "Show active" : "Show archived"}
+              </Link>
+            )}
             {canEdit(role) && !archived && (
               <Link href="/employees/new" className="inline-block rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90">
                 Add employee
@@ -62,7 +84,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
         {(q || status || group) && <Link href={archived ? "/employees?archived=1" : "/employees"} className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
       </form>
 
-      <div className="bg-white border border-line rounded overflow-x-auto">
+      <div className="hidden md:block bg-white border border-line rounded overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-left text-xs text-muted border-b border-line">
             <tr>
@@ -71,53 +93,52 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
               <th className="px-4 py-2 font-medium">Position</th>
               <th className="px-4 py-2 font-medium">Department</th>
               <th className="px-4 py-2 font-medium">Group</th>
-              <th className="px-4 py-2 font-medium">{date === todayManila() ? "Today" : formatDate(date, "short")}</th>
+              <th className="px-4 py-2 font-medium">{dayLabel}</th>
               <th className="px-4 py-2 font-medium">Status</th>
-              <th className="px-4 py-2" />
+              {showActions && <th className="px-4 py-2" />}
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
             {items.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-10 text-center text-sm text-muted">No employees match this search.</td></tr>
+              <tr><td colSpan={showActions ? 8 : 7} className="px-4 py-10 text-center text-sm text-muted">{empty}</td></tr>
             ) : (
               items.map((e) => (
                 <tr key={e.id}>
-                  <td className="px-4 py-3 tnum text-muted">{e.employee_code}</td>
-                  <td className="px-4 py-3">
-                    {archived ? (
-                      <span className="font-medium text-muted">{e.full_name}</span>
-                    ) : (
-                      <Link href={`/employees/${e.id}`} className="font-medium hover:underline underline-offset-2">{e.full_name}</Link>
-                    )}
-                  </td>
+                  <td className="px-4 py-3 tnum">{e.employee_code}</td>
+                  <td className="px-4 py-3">{name(e)}</td>
                   <td className="px-4 py-3">{e.position || "—"}</td>
                   <td className="px-4 py-3">{e.department || "—"}</td>
                   <td className="px-4 py-3">{groupLabel(e.employment_group)}</td>
-                  <td className="px-4 py-3 tnum text-xs">
-                    {formatClock(e.today_attendance?.clock_in_at)} – {formatClock(e.today_attendance?.clock_out_at)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${e.status === "active" ? "bg-moss/10 text-moss" : "bg-ink/10 text-muted"}`}>
-                      {e.status === "active" ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    {archived ? (
-                      isAdmin(role) && (
-                        <form action={restoreEmployee.bind(null, e.id)}>
-                          <button className="text-xs font-semibold underline underline-offset-2">Restore</button>
-                        </form>
-                      )
-                    ) : (
-                      canEdit(role) && <Link href={`/employees/${e.id}/edit`} className="text-xs font-semibold underline underline-offset-2">Edit</Link>
-                    )}
-                  </td>
+                  <td className="px-4 py-3 tnum text-xs">{dayTimes(e)}</td>
+                  <td className="px-4 py-3">{pill(e)}</td>
+                  {showActions && <td className="px-4 py-3 text-right">{action(e)}</td>}
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      <ul className="md:hidden bg-white border border-line rounded divide-y divide-line">
+        {items.length === 0 ? (
+          <li className="px-4 py-10 text-center text-sm text-muted">{empty}</li>
+        ) : (
+          items.map((e) => (
+            <li key={e.id} className="px-4 py-3 space-y-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">{name(e)}</div>
+                {pill(e)}
+              </div>
+              <p className="text-xs text-muted">{e.employee_code} · {e.position || "No position set"} · {e.department || "No department"}</p>
+              <p className="text-xs text-muted">{groupLabel(e.employment_group)}</p>
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <span className="text-sm tnum"><span className="text-xs text-muted">{dayLabel}</span> {dayTimes(e)}</span>
+                {showActions && action(e)}
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
 
       <Pager meta={meta} href={pageHref} empty={items.length === 0} />
     </>
