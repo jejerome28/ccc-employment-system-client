@@ -68,9 +68,14 @@ async function EmployeesContent(props: PageProps<"/employees">) {
               </Link>
             )}
             {canEdit(role) && !archived && (
-              <Link href="/employees/new" className="inline-block rounded bg-royal px-4 py-2 text-sm font-semibold text-white hover:bg-royal/90">
-                Add employee
-              </Link>
+              <>
+                <Link href="/employees/import" className="text-sm font-semibold text-royal underline underline-offset-2">
+                  Import employees
+                </Link>
+                <Link href="/employees/new" className="inline-block rounded bg-royal px-4 py-2 text-sm font-semibold text-white hover:bg-royal/90">
+                  Add employee
+                </Link>
+              </>
             )}
           </div>
         }

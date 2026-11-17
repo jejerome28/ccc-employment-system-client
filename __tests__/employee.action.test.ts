@@ -31,6 +31,7 @@ beforeEach(() => jest.clearAllMocks());
 
 it("employeeBody maps blanks to null and only known keys", () => {
   expect(employeeBody(fd())).toEqual({
+    biometric_id: null,
     employee_code: "EMP-100",
     first_name: "Maria",
     last_name: "Santos",
@@ -42,6 +43,12 @@ it("employeeBody maps blanks to null and only known keys", () => {
     employment_group: null,
     status: "active",
   });
+});
+
+it("employeeBody passes a trimmed Person ID", () => {
+  const f = fd();
+  f.set("biometric_id", " 1001 ");
+  expect(employeeBody(f).biometric_id).toBe("1001");
 });
 
 it("employeeBody passes a chosen employment group", () => {
