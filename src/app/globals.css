@@ -2,10 +2,15 @@
 
 @theme inline {
   --font-sans: var(--font-public-sans), system-ui, sans-serif;
-  --color-ink: #14181d;
-  --color-muted: #5a6472;
-  --color-canvas: #eceeea;
-  --color-line: #d8dcd6;
+  --font-heading: var(--font-ubuntu), var(--font-public-sans), sans-serif;
+  --font-wordmark: var(--font-cinzel), serif;
+  --color-ink: #111a33;
+  --color-muted: #5b6680;
+  --color-canvas: #f4f6fb;
+  --color-line: #d9dfec;
+  --color-navy: #0a1f5c;
+  --color-royal: #1435b0;
+  --color-gold: #f2b705;
   --color-moss: #1f6f4a;
   --color-clay: #b4691b;
   --color-brick: #9d2c2c;

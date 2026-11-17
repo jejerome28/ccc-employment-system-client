@@ -4,7 +4,7 @@ import type { PageMeta } from "@/app/_lib/types";
 
 export function Pager({ meta, href, empty }: { meta: PageMeta; href: (n: number) => string; empty: boolean }) {
   const links = pageLinks(meta);
-  const a = "underline underline-offset-2";
+  const a = "text-royal hover:text-navy underline underline-offset-2";
   return (
     <>
       {empty && meta.current_page > meta.last_page && (

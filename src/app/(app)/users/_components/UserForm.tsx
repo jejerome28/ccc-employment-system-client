@@ -6,7 +6,7 @@ import { FieldError } from "../../_components/FieldError";
 import { Notice } from "../../_components/Notice";
 import { saveUser } from "../_actions/user.action";
 
-const input = "w-full rounded border border-line px-3 py-2 text-sm focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink";
+const input = "w-full rounded border border-line px-3 py-2 text-sm focus:border-royal focus:outline-none focus:ring-1 focus:ring-royal";
 
 // One form for both: a table row when `user` is given, the create form otherwise.
 export function UserForm({ user }: { user?: User }) {
@@ -36,7 +36,7 @@ export function UserForm({ user }: { user?: User }) {
       </div>
       {field("password", user ? "New password (optional)" : "Password", { type: "password", required: !user, autoComplete: "new-password" })}
       <div className="pt-7">
-        <button type="submit" disabled={pending} className="rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90 disabled:opacity-60">
+        <button type="submit" disabled={pending} className="rounded bg-royal px-4 py-2 text-sm font-semibold text-white hover:bg-royal/90 disabled:opacity-60">
           {user ? "Save" : "Create user"}
         </button>
       </div>

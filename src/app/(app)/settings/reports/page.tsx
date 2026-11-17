@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { forbidden } from "next/navigation";
 import { apiData } from "@/app/_lib/api.server";
 import { currentUser, isAdmin } from "@/app/_lib/role";
 import type { ReportSignatory } from "@/app/_lib/types";
@@ -9,7 +9,7 @@ import { SignatoryForm } from "./_components/SignatoryForm";
 export const metadata: Metadata = { title: "Report settings" };
 
 export default async function ReportSettingsPage() {
-  if (!isAdmin((await currentUser()).role)) notFound();
+  if (!isAdmin((await currentUser()).role)) forbidden();
   const { signatories } = await apiData<{ signatories: ReportSignatory[] }>("/api/report-signatories");
 
   return (

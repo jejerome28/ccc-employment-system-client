@@ -37,7 +37,7 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
     worked: formatDuration(a),
   }));
   const empty = "No time records for this month.";
-  const edit = (id: number) => <Link href={`/attendance/${id}/edit`} className="inline-block -m-3 p-3 text-xs font-semibold underline underline-offset-2">Edit</Link>;
+  const edit = (id: number) => <Link href={`/attendance/${id}/edit`} className="inline-block -m-3 p-3 text-xs font-semibold text-royal hover:text-navy underline underline-offset-2">Edit</Link>;
 
   return (
     <>
@@ -46,7 +46,7 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
         subtitle={`${e.employee_code} · ${e.position || "No position set"}`}
         actions={
           editable && (
-            <Link href={`/employees/${e.id}/edit`} className="inline-block rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">
+            <Link href={`/employees/${e.id}/edit`} className="inline-block rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white">
               Edit details
             </Link>
           )
@@ -67,7 +67,7 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
           <form className="flex flex-wrap items-center gap-2">
             <label htmlFor="month" className="text-sm text-muted">Month</label>
             <input type="month" id="month" name="month" max={thisMonthManila()} defaultValue={month} className="rounded border border-line bg-white px-3 py-2 text-sm" />
-            <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Show</button>
+            <button className="rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white">Show</button>
             <span className="ml-auto text-sm text-muted tnum">
               {days_present} days · <strong className="text-ink">{formatMinutes(total_minutes)}</strong> total
             </span>

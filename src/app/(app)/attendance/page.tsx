@@ -14,7 +14,7 @@ import { ManualEntryForm } from "./_components/ManualEntryForm";
 export const metadata: Metadata = { title: "Time records" };
 
 const field = "rounded border border-line bg-white px-3 py-2 text-sm";
-const button = "rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas";
+const button = "rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white";
 const panel = "mb-5 bg-white border border-line rounded";
 const summary = "cursor-pointer select-none px-4 py-3 text-sm font-semibold";
 
@@ -41,7 +41,7 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
     notes: a.notes || (remarkLabel(a) ? "" : "—"),
   }));
   const empty = "Nobody has clocked in on this date yet.";
-  const edit = (id: number) => <Link href={`/attendance/${id}/edit`} className="inline-block -m-3 p-3 text-xs font-semibold underline underline-offset-2">Edit</Link>;
+  const edit = (id: number) => <Link href={`/attendance/${id}/edit`} className="inline-block -m-3 p-3 text-xs font-semibold text-royal hover:text-navy underline underline-offset-2">Edit</Link>;
 
   return (
     <>

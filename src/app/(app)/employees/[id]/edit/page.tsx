@@ -1,5 +1,6 @@
-import { notFound } from "next/navigation";
+import { forbidden } from "next/navigation";
 import { apiData } from "@/app/_lib/api.server";
+import { thisMonthManila } from "@/app/_lib/format";
 import { canEdit, currentUser, isAdmin } from "@/app/_lib/role";
 import type { EmployeeDetail } from "@/app/_lib/types";
 import { DeleteButton } from "../../../_components/DeleteButton";
@@ -10,8 +11,8 @@ import { EmployeeForm } from "../../_components/EmployeeForm";
 export default async function EditEmployeePage(props: PageProps<"/employees/[id]/edit">) {
   const { id } = await props.params;
   const { role } = await currentUser();
-  if (!canEdit(role)) notFound();
-  const { employee } = await apiData<EmployeeDetail>(`/api/employees/${id}`);
+  if (!canEdit(role)) forbidden();
+  const { employee } = await apiData<EmployeeDetail>(`/api/employees/${id}?month=${thisMonthManila()}`);
 
   return (
     <>

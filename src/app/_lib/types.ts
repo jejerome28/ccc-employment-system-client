@@ -104,7 +104,7 @@ export type Summary = {
   ungrouped_count: number;
   rows: SummaryRow[];
   totals: SummaryNumbers;
-  needs_check: { employee_id: number; name: string; work_date: string; punch: string }[];
+  needs_check: { attendance_id: number; employee_id: number; name: string; work_date: string; punch: string }[];
   meta: PageMeta;
 };
 

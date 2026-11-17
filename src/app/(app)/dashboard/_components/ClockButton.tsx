@@ -5,7 +5,7 @@ import { clock } from "../_actions/clock.action";
 
 export function ClockButton({ employeeId, kind }: { employeeId: number; kind: "time-in" | "time-out" }) {
   const [state, action, pending] = useActionState(clock.bind(null, employeeId, kind), undefined);
-  const style = kind === "time-in" ? "bg-moss text-white hover:bg-moss/90" : "bg-ink text-canvas hover:bg-ink/90";
+  const style = kind === "time-in" ? "bg-moss text-white hover:bg-moss/90" : "bg-royal text-white hover:bg-royal/90";
 
   return (
     <form action={action} className="flex flex-col items-end gap-1">
