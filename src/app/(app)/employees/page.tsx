@@ -39,10 +39,10 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
   const dayTimes = (e: Employee) => `${formatClock(e.today_attendance?.clock_in_at)} – ${formatClock(e.today_attendance?.clock_out_at)}`;
   const action = (e: Employee) => archived ? (
     <form action={restoreEmployee.bind(null, e.id)}>
-      <button className="inline-block -m-3 p-3 text-xs font-semibold underline underline-offset-2">Restore</button>
+      <button className="inline-block -m-3 p-3 text-xs font-semibold text-royal hover:text-navy underline underline-offset-2">Restore</button>
     </form>
   ) : (
-    <Link href={`/employees/${e.id}/edit`} className="inline-block -m-3 p-3 text-xs font-semibold underline underline-offset-2">Edit</Link>
+    <Link href={`/employees/${e.id}/edit`} className="inline-block -m-3 p-3 text-xs font-semibold text-royal hover:text-navy underline underline-offset-2">Edit</Link>
   );
 
   return (
@@ -58,7 +58,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
               </Link>
             )}
             {canEdit(role) && !archived && (
-              <Link href="/employees/new" className="inline-block rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90">
+              <Link href="/employees/new" className="inline-block rounded bg-royal px-4 py-2 text-sm font-semibold text-white hover:bg-royal/90">
                 Add employee
               </Link>
             )}
@@ -69,7 +69,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
       <form className="mb-5 flex flex-wrap gap-2">
         {archived && <input type="hidden" name="archived" value="1" />}
         <input type="search" name="q" defaultValue={q} placeholder="Search name, code, department"
-          className="flex-1 min-w-52 rounded border border-line bg-white px-3 py-2 text-sm focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink" />
+          className="flex-1 min-w-52 rounded border border-line bg-white px-3 py-2 text-sm focus:border-royal focus:outline-none focus:ring-1 focus:ring-royal" />
         <select name="status" defaultValue={status} className="rounded border border-line bg-white px-3 py-2 text-sm">
           <option value="">All statuses</option>
           <option value="active">Active</option>
@@ -80,7 +80,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
           {GROUPS.map((g) => <option key={g.value} value={g.value}>{g.label}</option>)}
           <option value="none">Not set</option>
         </select>
-        <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Search</button>
+        <button className="rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white">Search</button>
         {(q || status || group) && <Link href={archived ? "/employees?archived=1" : "/employees"} className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
       </form>
 

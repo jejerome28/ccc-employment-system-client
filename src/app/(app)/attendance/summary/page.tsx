@@ -24,7 +24,7 @@ const COLUMNS: { key: keyof SummaryNumbers; label: string }[] = [
 ];
 
 const field = "rounded border border-line bg-white px-3 py-2 text-sm";
-const button = "rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas";
+const button = "rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white";
 
 export default async function SummaryPage(props: PageProps<"/attendance/summary">) {
   const sp = await props.searchParams;
@@ -88,9 +88,9 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
           <input type="search" id="q" name="q" defaultValue={q} placeholder="Search employee" className={field} />
         </div>
         <button className={button}>Show</button>
-        <Link href={qs(cutoffRange(month, 1), keepQ)} className="px-3 py-2 text-sm underline underline-offset-2">1–15</Link>
+        <Link href={qs(cutoffRange(month, 1), keepQ)} className="px-3 py-2 text-sm text-royal hover:text-navy underline underline-offset-2">1–15</Link>
         {`${month}-16` <= todayManila() && (
-          <Link href={qs(cutoffRange(month, 2), keepQ)} className="px-3 py-2 text-sm underline underline-offset-2">16–end</Link>
+          <Link href={qs(cutoffRange(month, 2), keepQ)} className="px-3 py-2 text-sm text-royal hover:text-navy underline underline-offset-2">16–end</Link>
         )}
         {r.ok && (
           <span className="flex flex-wrap gap-2 sm:ml-auto">
@@ -105,7 +105,7 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
           {r.data.ungrouped_count > 0 && (
             <div role="status" className="mb-4 rounded border border-line bg-white px-4 py-3 text-sm">
               {r.data.ungrouped_count} employee(s) have no employment group. They appear under &quot;No group set&quot; in the CRA.{" "}
-              <Link href="/employees?group=none" className="font-semibold underline underline-offset-2">View</Link>
+              <Link href="/employees?group=none" className="font-semibold text-royal hover:text-navy underline underline-offset-2">View</Link>
             </div>
           )}
           {r.data.computed_through === null ? (
@@ -167,7 +167,7 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
                 </li>
               ))}
               {r.data.meta.total > 0 && (
-                <li className="bg-white border border-ink rounded px-4 py-3">
+                <li className="bg-white border border-navy rounded px-4 py-3">
                   <p className="font-semibold">Total</p>
                   {numbers(r.data.totals)}
                 </li>
@@ -177,19 +177,17 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
             <Pager meta={r.data.meta} href={(n) => `/attendance/summary${qs({ from, to }, { ...keepQ, page: String(n) })}`} empty={r.data.rows.length === 0} />
           </div>
 
-          {r.data.needs_check.length > 0 && (
+          {canEdit(role) && r.data.needs_check.length > 0 && (
             <>
-              <h2 className="font-semibold mb-2">Needs check</h2>
+              <h2 className="font-heading font-semibold text-navy mb-2">Needs check</h2>
               <p className="text-sm text-muted mb-3">
-                {canEdit(role)
-                  ? "Only one punch was recorded. Confirm against the guard logbook, then fix the record. These days aren't counted until then."
-                  : "Only one punch was recorded. These days aren't counted until HR fixes the record."}
+                Only one punch was recorded. Confirm against the guard logbook, then fix the record. These days aren&apos;t counted until then.
               </p>
               <ul className="bg-white border border-line rounded divide-y divide-line text-sm">
                 {r.data.needs_check.map((n) => (
-                  <li key={`${n.employee_id}-${n.work_date}`} className="px-4 py-3 flex flex-wrap justify-between gap-2">
+                  <li key={n.attendance_id} className="px-4 py-3 flex flex-wrap justify-between gap-2">
                     <span><span className="font-medium">{n.name}</span> · {formatDate(n.work_date, "short")} · one punch at {n.punch}</span>
-                    <Link href={`/attendance?date=${n.work_date}`} className="text-xs font-semibold underline underline-offset-2">Open day</Link>
+                    <Link href={`/attendance/${n.attendance_id}/edit`} className="text-xs font-semibold text-royal hover:text-navy underline underline-offset-2">Open day</Link>
                   </li>
                 ))}
               </ul>

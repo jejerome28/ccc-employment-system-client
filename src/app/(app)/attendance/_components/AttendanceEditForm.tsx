@@ -34,7 +34,7 @@ export function AttendanceEditForm({ attendance: a }: { attendance: Attendance }
           <input id="notes" name="notes" type="text" maxLength={255} defaultValue={state?.values?.notes ?? a.notes ?? ""} className={input} />
         </div>
         <div className="sm:col-span-2 flex items-center gap-3 pt-1">
-          <button disabled={pending} className="rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90 disabled:opacity-60">Save changes</button>
+          <button disabled={pending} className="rounded bg-royal px-4 py-2 text-sm font-semibold text-white hover:bg-royal/90 disabled:opacity-60">Save changes</button>
           <Link href={`/attendance?date=${a.work_date}`} className="text-sm text-muted underline underline-offset-2">Cancel</Link>
         </div>
       </div>

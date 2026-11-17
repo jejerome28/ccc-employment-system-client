@@ -6,7 +6,7 @@ import { FieldError } from "../../../_components/FieldError";
 import { Notice } from "../../../_components/Notice";
 import { saveSignatories } from "../_actions/signatory.action";
 
-const input = "w-full rounded border border-line px-3 py-2 text-sm focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink";
+const input = "w-full rounded border border-line px-3 py-2 text-sm focus:border-royal focus:outline-none focus:ring-1 focus:ring-royal";
 
 export function SignatoryForm({ signatories }: { signatories: ReportSignatory[] }) {
   const [state, action, pending] = useActionState(saveSignatories, undefined);
@@ -39,7 +39,7 @@ export function SignatoryForm({ signatories }: { signatories: ReportSignatory[] 
           </fieldset>
         );
       })}
-      <button type="submit" disabled={pending} className="rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90 disabled:opacity-60">
+      <button type="submit" disabled={pending} className="rounded bg-royal px-4 py-2 text-sm font-semibold text-white hover:bg-royal/90 disabled:opacity-60">
         {pending ? "Saving…" : "Save all"}
       </button>
     </form>

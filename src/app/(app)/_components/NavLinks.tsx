@@ -19,17 +19,20 @@ export function NavLinks({ role, onNavigate }: { role: Role; onNavigate?: () => 
   const links = NAV.filter((n) => !n.admin || role === "admin");
 
   return (
-    <nav className="px-3 pb-4 space-y-1">
+    <nav className="pb-4">
       {links.map(({ href, label }) => {
         const deeper = links.some((n) => n.href.length > href.length && pathname.startsWith(n.href));
         const active = pathname === href || (pathname.startsWith(`${href}/`) && !deeper);
         return (
           <Link
             key={href}
+            aria-current={active ? "page" : undefined}
             href={href}
             onClick={onNavigate}
-            className={`block whitespace-nowrap rounded px-3 py-2 text-sm transition ${
-              active ? "bg-canvas text-ink font-semibold" : "text-canvas/75 hover:bg-white/10"
+            className={`block whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold px-5 py-2.5 text-sm border-l-4 ${
+              active
+                ? "border-gold bg-white/10 text-white font-semibold"
+                : "border-transparent text-canvas/80 hover:bg-white/10 hover:text-white"
             }`}
           >
             {label}

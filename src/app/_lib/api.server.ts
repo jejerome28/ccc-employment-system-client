@@ -1,5 +1,5 @@
 import "server-only";
-import { notFound, redirect } from "next/navigation";
+import { forbidden, notFound, redirect } from "next/navigation";
 import { getToken } from "./session";
 import type { FieldErrors } from "./types";
 
@@ -36,6 +36,7 @@ export async function apiFetch<T>(path: string, init: Init = {}): Promise<ApiRes
 export async function apiData<T>(path: string): Promise<T> {
   const r = await apiFetch<T>(path);
   if (r.status === 404) notFound();
+  if (r.status === 403) forbidden();
   if (!r.ok) throw new Error(`API ${r.status}: ${r.message}`);
   return r.data;
 }

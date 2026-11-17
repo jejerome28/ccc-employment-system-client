@@ -57,7 +57,7 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
         title={isToday ? "Today" : "Latest imported day"}
         subtitle={formatDate(date, "long")}
         actions={
-          <Link href="/attendance" className="inline-block rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">
+          <Link href="/attendance" className="inline-block rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white">
             Open time records
           </Link>
         }
@@ -74,20 +74,20 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
 
       <form className="mb-5 flex flex-wrap gap-2">
         <input type="search" name="q" defaultValue={q} placeholder="Search employee" className="flex-1 min-w-52 rounded border border-line bg-white px-3 py-2 text-sm" />
-        <button className="rounded border border-ink px-4 py-2 text-sm font-semibold hover:bg-ink hover:text-canvas">Search</button>
+        <button className="rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white">Search</button>
         {q && <Link href="/dashboard" className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
       </form>
 
       <div className="bg-white border border-line rounded overflow-hidden">
         <div className="px-4 py-3 border-b border-line flex items-center justify-between">
-          <h2 className="font-semibold">Time clock</h2>
+          <h2 className="font-heading font-semibold text-navy">Time clock</h2>
           <span className="text-xs text-muted">{stats.active} active employees</span>
         </div>
 
         {employees.length === 0 ? (
           meta.total === 0 && <div className="px-4 py-10 text-center">
             <p className="text-sm text-muted mb-3">{q ? "No employees match this search." : "No active employees yet."}</p>
-            {!q && canEdit(role) && <Link href="/employees/new" className="text-sm font-semibold underline underline-offset-2">Add your first employee</Link>}
+            {!q && canEdit(role) && <Link href="/employees/new" className="text-sm font-semibold text-royal hover:text-navy underline underline-offset-2">Add your first employee</Link>}
           </div>
         ) : (
           <>

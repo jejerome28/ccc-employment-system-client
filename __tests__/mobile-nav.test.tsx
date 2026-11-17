@@ -61,3 +61,15 @@ test("does not reopen when returning to the page it was opened on", () => {
   rerender(<MobileNav {...props} />);
   expect(screen.queryByRole("link", { name: "Employees" })).not.toBeInTheDocument();
 });
+
+test("phone header shows the CCC shield", () => {
+  render(<MobileNav {...props} />);
+  expect(screen.getByRole("img", { name: "City College of Calamba shield" })).toBeInTheDocument();
+});
+
+test("active nav link is marked current", () => {
+  render(<MobileNav {...props} />);
+  fireEvent.click(toggle());
+  expect(screen.getByRole("link", { name: "Today" })).toHaveAttribute("aria-current", "page");
+  expect(screen.getByRole("link", { name: "Employees" })).not.toHaveAttribute("aria-current");
+});

@@ -37,7 +37,7 @@ export function EmployeeForm({ employee, submitLabel }: { employee?: Employee; s
               type={type}
               required={required}
               defaultValue={state?.values?.[name] ?? (employee?.[name] as string | null) ?? ""}
-              className={`w-full rounded border ${state?.errors?.[name] ? "border-brick" : "border-line"} px-3 py-2 text-sm focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink`}
+              className={`w-full rounded border ${state?.errors?.[name] ? "border-brick" : "border-line"} px-3 py-2 text-sm focus:border-royal focus:outline-none focus:ring-1 focus:ring-royal`}
             />
             <FieldError errors={state?.errors} name={name} />
           </div>
@@ -59,7 +59,7 @@ export function EmployeeForm({ employee, submitLabel }: { employee?: Employee; s
           <p className="mt-1 text-xs text-muted">Inactive staff stay in the database but leave the time clock.</p>
         </div>
         <div className="sm:col-span-2 flex items-center gap-3 pt-2">
-          <button type="submit" disabled={pending} className="rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90 disabled:opacity-60">
+          <button type="submit" disabled={pending} className="rounded bg-royal px-4 py-2 text-sm font-semibold text-white hover:bg-royal/90 disabled:opacity-60">
             {submitLabel}
           </button>
           <Link href="/employees" className="text-sm text-muted underline underline-offset-2">Cancel</Link>

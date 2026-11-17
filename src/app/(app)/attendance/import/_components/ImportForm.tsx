@@ -17,13 +17,13 @@ export function ImportForm() {
           <input
             id="file" name="file" type="file" required aria-describedby="file-hint"
             accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            className="block w-full text-sm text-muted file:mr-3 file:rounded file:border file:border-ink file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-ink hover:file:text-canvas"
+            className="block w-full text-sm text-muted file:mr-3 file:rounded file:border file:border-royal file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-royal hover:file:bg-royal hover:file:text-white"
           />
           <p id="file-hint" className="mt-2 text-xs text-muted">
             Upload the device&apos;s Attendance report export as it is. Rows are matched to employees by Person ID.
           </p>
         </div>
-        <button disabled={pending} className="rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90 disabled:opacity-60">
+        <button disabled={pending} className="rounded bg-royal px-4 py-2 text-sm font-semibold text-white hover:bg-royal/90 disabled:opacity-60">
           {pending ? "Importing…" : "Import"}
         </button>
       </form>

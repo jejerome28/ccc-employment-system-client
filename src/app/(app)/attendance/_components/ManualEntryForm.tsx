@@ -47,7 +47,7 @@ export function ManualEntryForm({ employees, date }: { employees: Employee[]; da
           <input id="notes" name="notes" type="text" maxLength={255} defaultValue={state?.values?.notes} placeholder="Half day, field work, forgot to clock out" className={input} />
         </div>
         <div>
-          <button disabled={pending} className="w-full rounded bg-ink px-4 py-2 text-sm font-semibold text-canvas hover:bg-ink/90 disabled:opacity-60">
+          <button disabled={pending} className="w-full rounded bg-royal px-4 py-2 text-sm font-semibold text-white hover:bg-royal/90 disabled:opacity-60">
             Save record
           </button>
         </div>
