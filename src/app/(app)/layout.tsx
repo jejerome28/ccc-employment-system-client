@@ -1,9 +1,10 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { formatDate, todayManila } from "@/app/_lib/format";
 import { currentUser } from "@/app/_lib/role";
 import { Brand } from "./_components/Brand";
 import { MobileNav } from "./_components/MobileNav";
+import { NavProgress } from "./_components/NavProgress";
 import { NavLinks } from "./_components/NavLinks";
 import { UserBlock } from "./_components/UserBlock";
 
@@ -13,6 +14,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-full lg:flex">
+      <Suspense fallback={null}>
+        <NavProgress />
+      </Suspense>
       <MobileNav role={user.role} name={user.name} email={user.email} today={today} />
       <aside className="hidden lg:flex lg:w-60 lg:flex-none lg:flex-col lg:sticky lg:top-0 lg:self-start lg:h-screen bg-navy text-canvas">
         <div className="px-5 py-5 border-b border-white/10">

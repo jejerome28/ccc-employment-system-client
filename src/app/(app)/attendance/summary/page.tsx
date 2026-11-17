@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Form from "next/form";
 import { redirect } from "next/navigation";
 import { apiFetch } from "@/app/_lib/api.server";
 import { currentCutoff, cutoffFor, cutoffRange, formatDate, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import { canEdit, currentUser } from "@/app/_lib/role";
 import type { Summary, SummaryNumbers, SummaryRow } from "@/app/_lib/types";
+import { KeyedBySearch } from "../../_components/KeyedBySearch";
 import { PageHeader } from "../../_components/PageHeader";
 import { Pager } from "../../_components/Pager";
 
@@ -26,7 +28,15 @@ const COLUMNS: { key: keyof SummaryNumbers; label: string }[] = [
 const field = "rounded border border-line bg-white px-3 py-2 text-sm";
 const button = "rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white";
 
-export default async function SummaryPage(props: PageProps<"/attendance/summary">) {
+export default function SummaryPage(props: PageProps<"/attendance/summary">) {
+  return (
+    <KeyedBySearch searchParams={props.searchParams}>
+      <SummaryContent {...props} />
+    </KeyedBySearch>
+  );
+}
+
+async function SummaryContent(props: PageProps<"/attendance/summary">) {
   const sp = await props.searchParams;
   const rangeGiven = Boolean(param(sp.from) || param(sp.to));
   const fallback = currentCutoff();
@@ -74,7 +84,7 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
         </div>
       )}
 
-      <form className="mb-5 flex flex-wrap items-end gap-2">
+      <Form action="" className="mb-5 flex flex-wrap items-end gap-2">
         <div>
           <label htmlFor="from" className="block text-xs text-muted mb-1">From</label>
           <input type="date" id="from" name="from" required max={todayManila()} defaultValue={from} className={field} />
@@ -94,11 +104,11 @@ export default async function SummaryPage(props: PageProps<"/attendance/summary"
         )}
         {r.ok && (
           <span className="flex flex-wrap gap-2 sm:ml-auto">
-            <a href={`/attendance/summary/export${qs({ from, to })}`} className={button}>Download review (.xlsx)</a>
-            <a href={`/attendance/summary/cra${qs({ from, to })}`} className={button}>Download CRA (.xlsx)</a>
+            <a data-no-progress href={`/attendance/summary/export${qs({ from, to })}`} className={button}>Download review (.xlsx)</a>
+            <a data-no-progress href={`/attendance/summary/cra${qs({ from, to })}`} className={button}>Download CRA (.xlsx)</a>
           </span>
         )}
-      </form>
+      </Form>
 
       {r.ok && (
         <>
