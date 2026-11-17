@@ -1,18 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Form from "next/form";
 import { apiData } from "@/app/_lib/api.server";
 import { GROUPS, groupLabel } from "@/app/_lib/groups";
 import { formatClock, formatDate, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import { canEdit, currentUser, isAdmin } from "@/app/_lib/role";
 import type { Employee, Paginated } from "@/app/_lib/types";
+import { KeyedBySearch } from "../_components/KeyedBySearch";
 import { PageHeader } from "../_components/PageHeader";
 import { Pager } from "../_components/Pager";
 import { restoreEmployee } from "./_actions/employee.action";
 
 export const metadata: Metadata = { title: "Employees" };
 
-export default async function EmployeesPage(props: PageProps<"/employees">) {
+export default function EmployeesPage(props: PageProps<"/employees">) {
+  return (
+    <KeyedBySearch searchParams={props.searchParams}>
+      <EmployeesContent {...props} />
+    </KeyedBySearch>
+  );
+}
+
+async function EmployeesContent(props: PageProps<"/employees">) {
   const sp = await props.searchParams;
   const q = param(sp.q);
   const status = param(sp.status);
@@ -66,7 +76,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
         }
       />
 
-      <form className="mb-5 flex flex-wrap gap-2">
+      <Form action="" className="mb-5 flex flex-wrap gap-2">
         {archived && <input type="hidden" name="archived" value="1" />}
         <input type="search" name="q" defaultValue={q} placeholder="Search name, code, department"
           className="flex-1 min-w-52 rounded border border-line bg-white px-3 py-2 text-sm focus:border-royal focus:outline-none focus:ring-1 focus:ring-royal" />
@@ -82,7 +92,7 @@ export default async function EmployeesPage(props: PageProps<"/employees">) {
         </select>
         <button className="rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white">Search</button>
         {(q || status || group) && <Link href={archived ? "/employees?archived=1" : "/employees"} className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
-      </form>
+      </Form>
 
       <div className="hidden md:block bg-white border border-line rounded overflow-x-auto">
         <table className="w-full text-sm">

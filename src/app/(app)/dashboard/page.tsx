@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Form from "next/form";
 import { apiData } from "@/app/_lib/api.server";
 import { formatClock, formatDate, formatDuration, formatMinutes, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import { canEdit, currentUser } from "@/app/_lib/role";
 import type { Attendance, DashboardData } from "@/app/_lib/types";
 import { InOutWorked } from "../_components/InOutWorked";
+import { KeyedBySearch } from "../_components/KeyedBySearch";
 import { PageHeader } from "../_components/PageHeader";
 import { Pager } from "../_components/Pager";
 import { RemarkBadge } from "../_components/RemarkBadge";
@@ -15,7 +17,15 @@ const CLOCK_BUTTONS = false;
 
 export const metadata: Metadata = { title: "Today" };
 
-export default async function DashboardPage(props: PageProps<"/dashboard">) {
+export default function DashboardPage(props: PageProps<"/dashboard">) {
+  return (
+    <KeyedBySearch searchParams={props.searchParams}>
+      <DashboardContent {...props} />
+    </KeyedBySearch>
+  );
+}
+
+async function DashboardContent(props: PageProps<"/dashboard">) {
   const sp = await props.searchParams;
   const q = param(sp.q);
   const page = param(sp.page);
@@ -72,11 +82,11 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
         ))}
       </div>
 
-      <form className="mb-5 flex flex-wrap gap-2">
+      <Form action="" className="mb-5 flex flex-wrap gap-2">
         <input type="search" name="q" defaultValue={q} placeholder="Search employee" className="flex-1 min-w-52 rounded border border-line bg-white px-3 py-2 text-sm" />
         <button className="rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white">Search</button>
         {q && <Link href="/dashboard" className="px-3 py-2 text-sm text-muted underline underline-offset-2">Clear</Link>}
-      </form>
+      </Form>
 
       <div className="bg-white border border-line rounded overflow-hidden">
         <div className="px-4 py-3 border-b border-line flex items-center justify-between">

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Form from "next/form";
 import { apiData } from "@/app/_lib/api.server";
 import { formatClock, formatDate, formatDuration, formatMinutes, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
 import { canEdit, currentUser } from "@/app/_lib/role";
 import type { AttendanceDay } from "@/app/_lib/types";
 import { InOutWorked } from "../_components/InOutWorked";
+import { KeyedBySearch } from "../_components/KeyedBySearch";
 import { PageHeader } from "../_components/PageHeader";
 import { Pager } from "../_components/Pager";
 import { RemarkBadge, remarkLabel } from "../_components/RemarkBadge";
@@ -18,7 +20,15 @@ const button = "rounded border border-royal px-4 py-2 text-sm font-semibold text
 const panel = "mb-5 bg-white border border-line rounded";
 const summary = "cursor-pointer select-none px-4 py-3 text-sm font-semibold";
 
-export default async function AttendancePage(props: PageProps<"/attendance">) {
+export default function AttendancePage(props: PageProps<"/attendance">) {
+  return (
+    <KeyedBySearch searchParams={props.searchParams}>
+      <AttendanceContent {...props} />
+    </KeyedBySearch>
+  );
+}
+
+async function AttendanceContent(props: PageProps<"/attendance">) {
   const sp = await props.searchParams;
   const picked = param(sp.date);
   const q = param(sp.q);
@@ -53,17 +63,17 @@ export default async function AttendancePage(props: PageProps<"/attendance">) {
         </div>
       )}
 
-      <form className="mb-5 flex flex-wrap items-center gap-2">
+      <Form action="" className="mb-5 flex flex-wrap items-center gap-2">
         <input type="date" name="date" aria-label="Day" max={todayManila()} defaultValue={date} className={field} />
         <input type="search" name="q" defaultValue={q} placeholder="Filter by employee" className={`flex-1 min-w-48 ${field}`} />
         <button className={button}>Show</button>
         <Link href={`/attendance?date=${todayManila()}`} className="px-3 py-2 text-sm text-muted underline underline-offset-2">Today</Link>
         <Link href="/attendance" className="px-3 py-2 text-sm text-muted underline underline-offset-2">Latest</Link>
-      </form>
+      </Form>
 
       <details className={panel} open={Boolean(exportError)}>
         <summary className={summary}>Download a date range</summary>
-        <form action="/attendance/export" method="get" className="px-4 pb-4 flex flex-wrap items-end gap-2">
+        <form action="/attendance/export" method="get" data-no-progress className="px-4 pb-4 flex flex-wrap items-end gap-2">
           <div>
             <label htmlFor="from" className="block text-xs text-muted mb-1">From</label>
             <input type="date" id="from" name="from" required max={todayManila()} defaultValue={monthStart} className={field} />

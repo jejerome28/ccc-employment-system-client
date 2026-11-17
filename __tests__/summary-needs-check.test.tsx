@@ -1,3 +1,4 @@
+import type React from "react";
 import { render, screen } from "@testing-library/react";
 import SummaryPage from "@/app/(app)/attendance/summary/page";
 import { apiFetch } from "@/app/_lib/api.server";
@@ -19,7 +20,8 @@ const props = { searchParams: Promise.resolve({ from: "2026-11-01", to: "2026-11
 async function renderAs(role: string, needs_check = data.needs_check) {
   (currentUser as jest.Mock).mockResolvedValue({ role });
   (apiFetch as jest.Mock).mockResolvedValue({ ok: true, status: 200, message: "", data: { ...data, needs_check } });
-  render(await SummaryPage(props));
+  const content = (SummaryPage(props) as React.ReactElement<{ children: React.ReactElement }>).props.children;
+  render(await (content.type as (p: unknown) => Promise<React.ReactElement>)(content.props));
 }
 
 describe("summary needs-check section", () => {

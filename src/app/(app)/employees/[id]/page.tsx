@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Form from "next/form";
 import { apiData } from "@/app/_lib/api.server";
 import { groupLabel } from "@/app/_lib/groups";
 import { formatClock, formatDate, formatDuration, formatMinutes, thisMonthManila } from "@/app/_lib/format";
@@ -6,10 +7,19 @@ import { param } from "@/app/_lib/params";
 import { canEdit, currentUser } from "@/app/_lib/role";
 import type { EmployeeCalendar, EmployeeDetail } from "@/app/_lib/types";
 import { AttendanceCalendar } from "./_components/AttendanceCalendar";
+import { KeyedBySearch } from "../../_components/KeyedBySearch";
 import { PageHeader } from "../../_components/PageHeader";
 import { InOutWorked } from "../../_components/InOutWorked";
 
-export default async function EmployeePage(props: PageProps<"/employees/[id]">) {
+export default function EmployeePage(props: PageProps<"/employees/[id]">) {
+  return (
+    <KeyedBySearch searchParams={props.searchParams}>
+      <EmployeeContent {...props} />
+    </KeyedBySearch>
+  );
+}
+
+async function EmployeeContent(props: PageProps<"/employees/[id]">) {
   const { id } = await props.params;
   const { role } = await currentUser();
   const month = param((await props.searchParams).month) || thisMonthManila();
@@ -64,14 +74,14 @@ export default async function EmployeePage(props: PageProps<"/employees/[id]">) 
 
         <div className="lg:col-span-2 space-y-4">
           <AttendanceCalendar cal={cal} canEdit={editable} />
-          <form className="flex flex-wrap items-center gap-2">
+          <Form action="" className="flex flex-wrap items-center gap-2">
             <label htmlFor="month" className="text-sm text-muted">Month</label>
             <input type="month" id="month" name="month" max={thisMonthManila()} defaultValue={month} className="rounded border border-line bg-white px-3 py-2 text-sm" />
             <button className="rounded border border-royal px-4 py-2 text-sm font-semibold text-royal hover:bg-royal hover:text-white">Show</button>
             <span className="ml-auto text-sm text-muted tnum">
               {days_present} days · <strong className="text-ink">{formatMinutes(total_minutes)}</strong> total
             </span>
-          </form>
+          </Form>
 
           <div className="hidden md:block bg-white border border-line rounded overflow-x-auto">
             <table className="w-full text-sm">

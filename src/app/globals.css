@@ -19,3 +19,8 @@
 @utility tnum {
   font-variant-numeric: tabular-nums;
 }
+
+@keyframes nav-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
