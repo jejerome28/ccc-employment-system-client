@@ -50,6 +50,14 @@ test("viewers do not get admin links", () => {
   fireEvent.click(toggle());
   expect(screen.getByRole("link", { name: "Cutoff summary" })).toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Users" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Import" })).not.toBeInTheDocument();
+});
+
+test("hr gets Import but not admin-only links", () => {
+  render(<MobileNav {...props} role="hr" />);
+  fireEvent.click(toggle());
+  expect(screen.getByRole("link", { name: "Import" })).toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Users" })).not.toBeInTheDocument();
 });
 
 test("does not reopen when returning to the page it was opened on", () => {

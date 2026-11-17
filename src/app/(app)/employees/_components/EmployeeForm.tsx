@@ -10,6 +10,7 @@ import { saveEmployee } from "../_actions/employee.action";
 
 const FIELDS: [keyof Employee, string, string, boolean][] = [
   ["employee_code", "Employee code", "text", true],
+  ["biometric_id", "Person ID (biometric)", "text", false],
   ["first_name", "First name", "text", true],
   ["last_name", "Last name", "text", true],
   ["email", "Email", "email", false],

@@ -9,14 +9,14 @@ const NAV = [
   { href: "/employees", label: "Employees" },
   { href: "/attendance", label: "Time records" },
   { href: "/attendance/summary", label: "Cutoff summary" },
-  { href: "/attendance/import", label: "Import", admin: true },
+  { href: "/attendance/import", label: "Import", editor: true },
   { href: "/users", label: "Users", admin: true },
   { href: "/settings/reports", label: "Report settings", admin: true },
 ];
 
 export function NavLinks({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
   const pathname = usePathname();
-  const links = NAV.filter((n) => !n.admin || role === "admin");
+  const links = NAV.filter((n) => (!n.admin || role === "admin") && (!n.editor || role !== "viewer"));
 
   return (
     <nav className="pb-4">
