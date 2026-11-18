@@ -5,7 +5,7 @@ import { LoginForm } from "./_components/LoginForm";
 export const metadata: Metadata = { title: "Sign in" };
 
 export default async function LoginPage(props: PageProps<"/login">) {
-  const { expired } = await props.searchParams;
+  const { expired, changed } = await props.searchParams;
 
   return (
     <div className="min-h-full flex flex-wrap bg-canvas text-ink">
@@ -32,9 +32,9 @@ export default async function LoginPage(props: PageProps<"/login">) {
         <div className="w-full max-w-sm rounded-xl border border-line bg-white p-9 shadow-sm">
           <h2 className="font-heading text-2xl font-bold text-navy">Sign in</h2>
           <p className="mt-1.5 text-sm text-muted">Sign in to manage employees and daily time in and time out.</p>
-          {expired && (
+          {(expired || changed) && (
             <p role="status" className="mt-4 rounded bg-clay/20 px-3 py-2 text-sm">
-              Your session expired. Sign in again.
+              {changed ? "Password changed. Sign in again." : "Your session ended. Sign in again."}
             </p>
           )}
           <LoginForm />
