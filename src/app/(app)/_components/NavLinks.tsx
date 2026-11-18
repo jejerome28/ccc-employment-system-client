@@ -6,17 +6,17 @@ import type { Role } from "@/app/_lib/types";
 
 const NAV = [
   { href: "/dashboard", label: "Today" },
-  { href: "/employees", label: "Employees" },
+  { href: "/employees", label: "Employees", viewer: true },
   { href: "/attendance", label: "Time records" },
   { href: "/attendance/summary", label: "Cutoff summary" },
-  { href: "/attendance/import", label: "Import", editor: true },
+  { href: "/attendance/import", label: "Import" },
   { href: "/users", label: "Users", admin: true },
   { href: "/settings/reports", label: "Report settings", admin: true },
 ];
 
 export function NavLinks({ role, onNavigate }: { role: Role; onNavigate?: () => void }) {
   const pathname = usePathname();
-  const links = NAV.filter((n) => (!n.admin || role === "admin") && (!n.editor || role !== "viewer"));
+  const links = NAV.filter((n) => role === "viewer" ? n.viewer : !n.admin || role === "admin");
 
   return (
     <nav className="pb-4">

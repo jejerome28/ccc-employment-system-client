@@ -4,6 +4,8 @@ import SummaryPage from "@/app/(app)/attendance/summary/page";
 import { apiFetch } from "@/app/_lib/api.server";
 import { currentUser } from "@/app/_lib/role";
 
+process.env.__NEXT_EXPERIMENTAL_AUTH_INTERRUPTS = "true";
+
 jest.mock("server-only", () => ({}));
 jest.mock("@/app/_lib/session", () => ({ getToken: jest.fn() }));
 jest.mock("@/app/_lib/api.server", () => ({ apiFetch: jest.fn() }));
@@ -31,9 +33,11 @@ describe("summary needs-check section", () => {
     expect(screen.getByRole("link", { name: "Open day" }).getAttribute("href")).toBe("/attendance/42/edit");
   });
 
-  it("viewer does not see it", async () => {
-    await renderAs("viewer");
-    expect(screen.queryByRole("heading", { name: "Needs check" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Open day" })).toBeNull();
+  it("viewer gets 403", async () => {
+    (currentUser as jest.Mock).mockResolvedValue({ role: "viewer" });
+    (apiFetch as jest.Mock).mockResolvedValue({ ok: false, status: 403, message: "" });
+    const content = (SummaryPage(props) as React.ReactElement<{ children: React.ReactElement }>).props.children;
+    const digest = await (content.type as (p: unknown) => Promise<unknown>)(content.props).then(() => undefined, (e: { digest?: string }) => e.digest);
+    expect(digest).toBe("NEXT_HTTP_ERROR_FALLBACK;403");
   });
 });

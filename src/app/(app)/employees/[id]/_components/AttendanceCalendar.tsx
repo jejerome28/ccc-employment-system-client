@@ -24,7 +24,7 @@ const DOT_CLASS: Partial<Record<CalendarStatus, string>> = {
 const HEADINGS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export function AttendanceCalendar({ cal, canEdit }: { cal: EmployeeCalendar; canEdit: boolean }) {
+export function AttendanceCalendar({ cal, canEdit, nav: showNav = true }: { cal: Omit<EmployeeCalendar, "employee">; canEdit: boolean; nav?: boolean }) {
   const [y, m] = cal.month.split("-").map(Number);
   const t = cal.totals;
   const nav = "text-royal hover:text-navy text-sm font-semibold underline underline-offset-2";
@@ -32,9 +32,9 @@ export function AttendanceCalendar({ cal, canEdit }: { cal: EmployeeCalendar; ca
   return (
     <div className="bg-white border border-line rounded p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <Link href={`?month=${cal.prev_month}`} className={nav}>‹ Prev</Link>
+        {showNav ? <Link href={`?month=${cal.prev_month}`} className={nav}>‹ Prev</Link> : <span />}
         <h2 className="font-heading font-semibold text-navy">{MONTHS[m - 1]} {y}</h2>
-        {cal.next_month <= thisMonthManila() ? <Link href={`?month=${cal.next_month}`} className={nav}>Next ›</Link> : <span />}
+        {showNav && cal.next_month <= thisMonthManila() ? <Link href={`?month=${cal.next_month}`} className={nav}>Next ›</Link> : <span />}
       </div>
 
       <div className="grid grid-cols-7 gap-1 text-center text-sm">

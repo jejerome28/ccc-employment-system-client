@@ -45,12 +45,13 @@ test("closes when the route changes (e.g. browser Back)", () => {
   expect(screen.queryByRole("link", { name: "Today" })).not.toBeInTheDocument();
 });
 
-test("viewers do not get admin links", () => {
+test("viewers only get Employees", () => {
   render(<MobileNav {...props} role="viewer" />);
   fireEvent.click(toggle());
-  expect(screen.getByRole("link", { name: "Cutoff summary" })).toBeInTheDocument();
-  expect(screen.queryByRole("link", { name: "Users" })).not.toBeInTheDocument();
-  expect(screen.queryByRole("link", { name: "Import" })).not.toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Employees" })).toBeInTheDocument();
+  for (const name of ["Today", "Time records", "Cutoff summary", "Import", "Users"]) {
+    expect(screen.queryByRole("link", { name })).not.toBeInTheDocument();
+  }
 });
 
 test("hr gets Import but not admin-only links", () => {

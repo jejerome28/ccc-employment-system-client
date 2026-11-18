@@ -6,6 +6,7 @@ import AttendancePage from "@/app/(app)/attendance/page";
 import SummaryPage from "@/app/(app)/attendance/summary/page";
 import EmployeesPage from "@/app/(app)/employees/page";
 import EmployeePage from "@/app/(app)/employees/[id]/page";
+import { currentUser } from "@/app/_lib/role";
 
 jest.mock("server-only", () => ({}));
 jest.mock("next/cache", () => ({ revalidatePath: jest.fn() }));
@@ -26,8 +27,9 @@ test.each([
   ["summary", SummaryPage],
   ["employees", EmployeesPage],
   ["employee", EmployeePage],
-])("%s page wraps its content in KeyedBySearch", (_, Page) => {
+])("%s page wraps its content in KeyedBySearch", async (_, Page) => {
+  (currentUser as jest.Mock).mockResolvedValue({ role: "hr" });
   const props = { params: Promise.resolve({ id: "7" }), searchParams: Promise.resolve({}) } as never;
-  const el = (Page as (p: never) => unknown)(props);
+  const el = await (Page as (p: never) => unknown)(props);
   expect(isValidElement(el) && el.type).toBe(KeyedBySearch);
 });
