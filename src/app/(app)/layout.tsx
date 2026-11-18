@@ -26,7 +26,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <NavLinks role={user.role} />
         </div>
         <div className="px-5 py-4 border-t border-white/10 mt-auto">
-          <UserBlock name={user.name} email={user.email} />
+          <UserBlock name={user.name} email={user.email} role={user.role} />
         </div>
       </aside>
       <main className="flex-1 min-w-0">

@@ -51,7 +51,7 @@ export function MobileNav({ role, name, email, today }: { role: Role; name: stri
         <div id="mobile-menu" className="border-t border-white/10 pt-3">
           <NavLinks role={role} onNavigate={close} />
           <div className="px-5 py-4 border-t border-white/10">
-            <UserBlock name={name} email={email} />
+            <UserBlock name={name} email={email} role={role} />
           </div>
         </div>
       )}

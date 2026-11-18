@@ -11,7 +11,12 @@ test("login shows CCC identity and the form", async () => {
   expect(screen.getByRole("heading", { level: 2, name: "Sign in" })).toBeInTheDocument();
 });
 
-test("expired notice still shows", async () => {
+test("expired notice covers being signed out elsewhere", async () => {
   render(await LoginPage({ searchParams: Promise.resolve({ expired: "1" }) } as never));
-  expect(screen.getByRole("status")).toHaveTextContent("Your session expired. Sign in again.");
+  expect(screen.getByRole("status")).toHaveTextContent("Your session ended. Sign in again.");
+});
+
+test("password-changed notice", async () => {
+  render(await LoginPage({ searchParams: Promise.resolve({ changed: "1" }) } as never));
+  expect(screen.getByRole("status")).toHaveTextContent("Password changed. Sign in again.");
 });
