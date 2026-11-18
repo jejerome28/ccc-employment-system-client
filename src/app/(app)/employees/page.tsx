@@ -11,6 +11,7 @@ import { KeyedBySearch } from "../_components/KeyedBySearch";
 import { PageHeader } from "../_components/PageHeader";
 import { Pager } from "../_components/Pager";
 import { restoreEmployee } from "./_actions/employee.action";
+import { EmployeeLookup } from "./_components/EmployeeLookup";
 
 export const metadata: Metadata = { title: "Employees" };
 
@@ -29,6 +30,14 @@ async function EmployeesContent(props: PageProps<"/employees">) {
   const group = param(sp.group);
   const page = param(sp.page) || "1";
   const { role } = await currentUser();
+  if (role === "viewer") {
+    return (
+      <>
+        <PageHeader title="My time records" subtitle="Enter your employee code to see your records." />
+        <EmployeeLookup />
+      </>
+    );
+  }
   const archived = param(sp.archived) === "1" && isAdmin(role);
   const showActions = archived || canEdit(role);
 

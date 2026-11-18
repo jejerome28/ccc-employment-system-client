@@ -149,3 +149,11 @@ export type EmployeeCalendar = {
 };
 
 export type ReportSignatory = { id: number; position: number; label: string; name: string; title: string };
+
+export type EmployeeLookup = {
+  employee: Pick<Employee, "full_name" | "employee_code" | "position" | "department" | "employment_group" | "status"> & { person_id: string };
+  calendar: Omit<EmployeeCalendar, "employee">;
+  attendances: Attendance[];
+  total_minutes: number;
+  days_present: number;
+};

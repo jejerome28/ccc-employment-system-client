@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Form from "next/form";
+import { redirect } from "next/navigation";
 import { apiData } from "@/app/_lib/api.server";
 import { formatClock, formatDate, formatDuration, formatMinutes, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
@@ -17,7 +18,8 @@ const CLOCK_BUTTONS = false;
 
 export const metadata: Metadata = { title: "Today" };
 
-export default function DashboardPage(props: PageProps<"/dashboard">) {
+export default async function DashboardPage(props: PageProps<"/dashboard">) {
+  if ((await currentUser()).role === "viewer") redirect("/employees");
   return (
     <KeyedBySearch searchParams={props.searchParams}>
       <DashboardContent {...props} />

@@ -50,6 +50,12 @@ describe("AttendanceCalendar", () => {
     expect(container.querySelectorAll('a[href^="/attendance/"]')).toHaveLength(0);
   });
 
+  it("nav={false} hides the month links", () => {
+    render(<AttendanceCalendar cal={cal} canEdit={false} nav={false} />);
+    expect(screen.queryByRole("link", { name: /Prev/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Next/ })).toBeNull();
+  });
+
   it("renders the legend", () => {
     render(<AttendanceCalendar cal={cal} canEdit={false} />);
     for (const l of cal.legend) expect(screen.getAllByText(l.label).length).toBeGreaterThan(0);

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Form from "next/form";
-import { redirect } from "next/navigation";
+import { forbidden, redirect } from "next/navigation";
 import { apiFetch } from "@/app/_lib/api.server";
 import { currentCutoff, cutoffFor, cutoffRange, formatDate, todayManila } from "@/app/_lib/format";
 import { param } from "@/app/_lib/params";
@@ -53,6 +53,8 @@ async function SummaryContent(props: PageProps<"/attendance/summary">) {
     apiFetch<Summary>(`/api/attendance/summary${qs({ from, to }, { ...keepQ, ...(page ? { page } : {}) })}`),
     currentUser(),
   ]);
+
+  if (!canEdit(role)) forbidden();
 
   if (!rangeGiven && !exportError && r.ok && r.data.computed_through !== null && r.data.computed_through < from) {
     redirect(`/attendance/summary${qs(cutoffFor(r.data.computed_through), keepQ)}`);
@@ -187,7 +189,7 @@ async function SummaryContent(props: PageProps<"/attendance/summary">) {
             <Pager meta={r.data.meta} href={(n) => `/attendance/summary${qs({ from, to }, { ...keepQ, page: String(n) })}`} empty={r.data.rows.length === 0} />
           </div>
 
-          {canEdit(role) && r.data.needs_check.length > 0 && (
+          {r.data.needs_check.length > 0 && (
             <>
               <h2 className="font-heading font-semibold text-navy mb-2">Needs check</h2>
               <p className="text-sm text-muted mb-3">
